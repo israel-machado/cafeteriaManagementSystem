@@ -5,9 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import model.Material.MaterialDomain;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -16,13 +13,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Document(collection = "itensCardapio")
-public class ItemCardapioDomain {
+public class ItemCardapioRequest {
 
-    @Id
-    private String id;
     private String nome;
     private BigDecimal valorVenda;
-    @DBRef
     private List<MaterialDomain> materiaisConsumidos;
 }
