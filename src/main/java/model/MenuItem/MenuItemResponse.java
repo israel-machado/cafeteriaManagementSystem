@@ -1,4 +1,4 @@
-package model.ItemCardapio;
+package model.MenuItem;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,9 +13,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class ItemCardapioRequest {
+public class MenuItemResponse {
 
-    private String nome;
-    private BigDecimal valorVenda;
-    private List<MaterialDomain> materiaisConsumidos;
+    private String id;
+    private String name;
+    private BigDecimal saleValue;
+    private List<MaterialDomain> materialsConsumed;
 }

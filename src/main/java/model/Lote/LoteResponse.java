@@ -13,6 +13,6 @@ import model.Material.MaterialDomain;
 public class LoteResponse {
 
     private String id;
-    private Double quantidadeConsumida;
+    private Double amountConsumed;
     private MaterialDomain materialDomain;
 }

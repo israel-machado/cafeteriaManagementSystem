@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import model.ItemCardapio.ItemCardapioDomain;
+import model.MenuItem.MenuItemDomain;
 import model.Material.MaterialDomain;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -22,9 +22,9 @@ public class VendaDomain {
 
     @Id
     private String id;
-    private BigDecimal valorVenda;
+    private BigDecimal saleValue;
     @DBRef
-    private ItemCardapioDomain itemCardapioDomain;
+    private MenuItemDomain menuItemDomain;
     @DBRef
-    private List<MaterialDomain> materiaisConsumidos;
+    private List<MaterialDomain> materialsConsumed;
 }

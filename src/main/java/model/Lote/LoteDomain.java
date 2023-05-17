@@ -18,7 +18,7 @@ public class LoteDomain {
 
     @Id
     private String id;
-    private Double quantidadeConsumida;
+    private Double amountConsumed;
     @DBRef
     private MaterialDomain materialDomain;
 }

@@ -15,9 +15,9 @@ import java.util.Date;
 public class MaterialResponse {
 
     private String id;
-    private String nome;
-    private Double quantidade;
-    private String unidadeMedida;
-    private Date validade;
-    private BigDecimal custo;
+    private String name;
+    private Double quantity;
+    private String unitMeasure;
+    private Date validity;
+    private BigDecimal cost;
 }

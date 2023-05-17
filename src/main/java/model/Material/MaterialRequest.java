@@ -14,9 +14,9 @@ import java.util.Date;
 @Data
 public class MaterialRequest {
 
-    private String nome;
-    private Double quantidade;
-    private String unidadeMedida;
-    private Date validade;
-    private BigDecimal custo;
+    private String name;
+    private Double quantity;
+    private String unitMeasure;
+    private Date validity;
+    private BigDecimal cost;
 }

@@ -1,4 +1,4 @@
-package model.ItemCardapio;
+package model.MenuItem;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,12 +17,12 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 @Document(collection = "itensCardapio")
-public class ItemCardapioDomain {
+public class MenuItemDomain {
 
     @Id
     private String id;
-    private String nome;
-    private BigDecimal valorVenda;
+    private String name;
+    private BigDecimal saleValue;
     @DBRef
-    private List<MaterialDomain> materiaisConsumidos;
+    private List<MaterialDomain> materialsConsumed;
 }

@@ -12,6 +12,6 @@ import model.Material.MaterialDomain;
 @Data
 public class LoteRequest {
 
-    private Double quantidadeConsumida;
+    private Double amountConsumed;
     private MaterialDomain materialDomain;
 }
