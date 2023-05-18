@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import model.Material.MaterialDomain;
 
+import java.math.BigDecimal;
+
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -13,5 +15,6 @@ import model.Material.MaterialDomain;
 public class LoteRequest {
 
     private Double amountConsumed;
+    private BigDecimal totalCost;
     private MaterialDomain materialDomain;
 }

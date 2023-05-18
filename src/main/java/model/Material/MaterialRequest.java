@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import model.Lote.LoteDomain;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -19,4 +20,5 @@ public class MaterialRequest {
     private String unitMeasure;
     private Date validity;
     private BigDecimal cost;
+    private LoteDomain loteDomain;
 }

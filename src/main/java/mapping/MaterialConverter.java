@@ -14,6 +14,7 @@ public class MaterialConverter {
                 .unitMeasure(materialDomain.getUnitMeasure())
                 .validity(materialDomain.getValidity())
                 .cost(materialDomain.getCost())
+                .loteDomain(materialDomain.getLoteDomain())
                 .build();
     }
 
@@ -24,6 +25,7 @@ public class MaterialConverter {
                 .unitMeasure(materialRequest.getUnitMeasure())
                 .validity(materialRequest.getValidity())
                 .cost(materialRequest.getCost())
+                .loteDomain(materialRequest.getLoteDomain())
                 .build();
     }
 }
