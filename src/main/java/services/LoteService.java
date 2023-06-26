@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import repositories.LoteRepository;
 
 import java.math.BigDecimal;
+import java.util.Calendar;
+import java.util.Date;
 
 @Service
 public class LoteService {
@@ -22,14 +24,16 @@ public class LoteService {
         // Quantidade consumida iniciada em 0
         Double initialAmountConsumed = 0.0;
 
-        // Criando o objeto LoteRequest com as informações calculadas e o MaterialDomain associado
-        LoteRequest loteRequest = LoteRequest.builder()
+        // Criando a validade inicial do lote (exemplo: 1 ano a partir da data atual)
+        Date initialValidity = calculateInitialValidity();
+
+        // Criando o objeto LoteDomain com as informações calculadas e o MaterialDomain associado
+        LoteDomain loteDomain = LoteDomain.builder()
                 .amountConsumed(initialAmountConsumed)
                 .totalCost(calculatedTotalCost)
+                .validity(initialValidity)
                 .materialDomain(materialDomain)
                 .build();
-
-        LoteDomain loteDomain = loteConverter.convertLoteRequestToDomain(loteRequest);
 
         return loteRepository.save(loteDomain);
     }
@@ -37,5 +41,11 @@ public class LoteService {
     private BigDecimal calculateTotalCost(MaterialDomain materialDomain) {
         BigDecimal quantity = BigDecimal.valueOf(materialDomain.getQuantity());
         return quantity.multiply(materialDomain.getCost());
+    }
+
+    private Date calculateInitialValidity() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MONTH, 1); // Exemplo: adicionando 1 ano à data atual
+        return calendar.getTime();
     }
 }

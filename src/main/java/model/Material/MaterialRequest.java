@@ -4,10 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import model.Lote.LoteDomain;
+import model.Lote.LoteRequest;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.util.List;
 
 @Builder
 @AllArgsConstructor
@@ -18,7 +18,6 @@ public class MaterialRequest {
     private String name;
     private Double quantity;
     private String unitMeasure;
-    private Date validity;
     private BigDecimal cost;
-    private LoteDomain loteDomain;
+    private List<LoteRequest> loteRequestList;
 }

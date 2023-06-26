@@ -1,15 +1,16 @@
 package services;
 
+import exceptions.InsufficientMaterialStockException;
+import exceptions.InsufficientStockException;
+import exceptions.InvalidDataException;
+import exceptions.InvalidMaterialDataException;
 import mapping.MaterialConverter;
 import model.Lote.LoteDomain;
-import model.Lote.LoteRequest;
 import model.Material.MaterialDomain;
 import model.Material.MaterialRequest;
 import model.Material.MaterialResponse;
 import org.springframework.stereotype.Service;
 import repositories.MaterialRepository;
-import services.exceptions.InsufficientStockException;
-import services.exceptions.InvalidDataException;
 
 import java.math.BigDecimal;
 
@@ -21,26 +22,35 @@ public class MaterialService {
         private LoteService loteService;
 
         public MaterialResponse registerMaterial(MaterialRequest materialRequest) {
-            // Validação dos dados
-            validateMaterialRequest(materialRequest);
+            try {
+                // Validação dos dados
+                validateMaterialRequest(materialRequest);
 
-            // Convertendo a requisição para o domínio
-            MaterialDomain materialDomain = materialConverter.convertMaterialRequestToDomain(materialRequest);
+                // Convertendo a requisição para o domínio
+                MaterialDomain materialDomain = materialConverter.convertMaterialRequestToDomain(materialRequest);
 
-            // Salvando o material no banco de dados
-            materialDomain = materialRepository.save(materialDomain);
+                // Salvando o material no banco de dados
+                materialDomain = materialRepository.save(materialDomain);
 
-            // Criação de um lote para o material
-            LoteDomain loteDomain = loteService.createLote(materialDomain);
+                // Criação de um lote para o material
+                LoteDomain loteDomain = loteService.createLote(materialDomain);
 
-            // Associando o lote ao material
-            materialDomain.setLoteDomain(loteDomain);
+                // Associação do lote ao material
+                materialDomain.getLoteDomainList().add(loteDomain);
 
-            // Atualizando o material no banco de dados com a associação ao lote
-            materialDomain = materialRepository.save(materialDomain);
+                // Atualizando o material no banco de dados com a associação ao lote
+                materialDomain = materialRepository.save(materialDomain);
 
-            // Convertendo o domínio para a resposta
-            return materialConverter.convertMaterialDomainToResponse(materialDomain);
+                // Convertendo o domínio para a resposta
+                return materialConverter.convertMaterialDomainToResponse(materialDomain);
+
+            } catch (InvalidDataException e) {
+                // Se os dados forem inválidos, lance uma exceção personalizada
+                throw new InvalidMaterialDataException(e.getMessage());
+            } catch (InsufficientStockException e) {
+                // Se houver estoque insuficiente, lance uma exceção personalizada
+                throw new InsufficientMaterialStockException(e.getMessage());
+            }
         }
 
         private void validateMaterialRequest(MaterialRequest materialRequest) {
@@ -50,6 +60,7 @@ public class MaterialService {
             if (materialRequest.getName() == null || materialRequest.getName().isEmpty()) {
                 throw new InvalidDataException("O nome do material é obrigatório");
             }
+            //TODO verificar se material ja existe
             // ...
         }
 

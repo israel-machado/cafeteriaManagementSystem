@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.util.List;
 
 @Builder
 @AllArgsConstructor
@@ -24,8 +24,7 @@ public class MaterialDomain {
     private String name;
     private Double quantity;
     private String unitMeasure;
-    private Date validity;
     private BigDecimal cost;
     @DBRef
-    private LoteDomain loteDomain;
+    private List<LoteDomain> loteDomainList;
 }

@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import model.Material.MaterialDomain;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 @Builder
 @AllArgsConstructor
@@ -17,5 +18,6 @@ public class LoteResponse {
     private String id;
     private Double amountConsumed;
     private BigDecimal totalCost;
+    private Date validity;
     private MaterialDomain materialDomain;
 }
