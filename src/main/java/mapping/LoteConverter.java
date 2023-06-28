@@ -10,6 +10,7 @@ public class LoteConverter {
         return LoteDomain.builder()
                 .amountConsumed(loteRequest.getAmountConsumed())
                 .totalCost(loteRequest.getTotalCost())
+                .validity(loteRequest.getValidity())
                 .materialDomain(loteRequest.getMaterialDomain())
                 .build();
     }
@@ -19,6 +20,7 @@ public class LoteConverter {
                 .id(loteDomain.getId())
                 .amountConsumed(loteDomain.getAmountConsumed())
                 .totalCost(loteDomain.getTotalCost())
+                .validity(loteDomain.getValidity())
                 .materialDomain(loteDomain.getMaterialDomain())
                 .build();
     }

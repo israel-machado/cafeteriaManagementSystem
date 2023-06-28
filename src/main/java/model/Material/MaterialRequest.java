@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import model.Lote.LoteRequest;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Builder
 @AllArgsConstructor
@@ -19,5 +18,5 @@ public class MaterialRequest {
     private Double quantity;
     private String unitMeasure;
     private BigDecimal cost;
-    private List<LoteRequest> loteRequestList;
+    private LoteRequest loteRequest;
 }

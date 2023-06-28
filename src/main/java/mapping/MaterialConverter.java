@@ -26,14 +26,12 @@ public class MaterialConverter {
     }
 
     public MaterialDomain convertMaterialRequestToDomain(MaterialRequest materialRequest) {
-        List<LoteDomain> loteDomainList = convertLoteRequestListToDomainList(materialRequest.getLoteRequestList());
 
         return MaterialDomain.builder()
                 .name(materialRequest.getName())
                 .quantity(materialRequest.getQuantity())
                 .unitMeasure(materialRequest.getUnitMeasure())
                 .cost(materialRequest.getCost())
-                .loteDomainList(loteDomainList)
                 .build();
     }
 
@@ -54,21 +52,5 @@ public class MaterialConverter {
         }
 
         return loteResponseList;
-    }
-
-    private List<LoteDomain> convertLoteRequestListToDomainList(List<LoteRequest> loteRequestList) {
-        List<LoteDomain> loteDomainList = new ArrayList<>();
-
-        for (LoteRequest loteRequest : loteRequestList) {
-            LoteDomain loteDomain = LoteDomain.builder()
-                    .amountConsumed(loteRequest.getAmountConsumed())
-                    .totalCost(loteRequest.getTotalCost())
-                    .validity(loteRequest.getValidity())
-                    .build();
-
-            loteDomainList.add(loteDomain);
-        }
-
-        return loteDomainList;
     }
 }
