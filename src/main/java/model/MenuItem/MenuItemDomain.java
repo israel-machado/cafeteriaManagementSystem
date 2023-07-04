@@ -24,5 +24,5 @@ public class MenuItemDomain {
     private String name;
     private BigDecimal saleValue;
     @DBRef
-    private List<MaterialDomain> materialsConsumed;
+    private List<MaterialDomain> materialsRecipe;
 }

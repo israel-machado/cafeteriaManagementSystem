@@ -18,5 +18,5 @@ public class MenuItemResponse {
     private String id;
     private String name;
     private BigDecimal saleValue;
-    private List<MaterialDomain> materialsConsumed;
+    private List<MaterialDomain> materialsRecipe;
 }
