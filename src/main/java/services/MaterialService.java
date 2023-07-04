@@ -15,6 +15,8 @@ import model.Material.MaterialDomain;
 import model.Material.MaterialRequest;
 import model.Material.MaterialResponse;
 import org.bson.Document;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import repositories.MaterialRepository;
 
@@ -22,6 +24,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MaterialService {
@@ -30,6 +34,46 @@ public class MaterialService {
         private MaterialRepository materialRepository;
         private LoteService loteService;
 
+        // GET ALL
+        public List<MaterialResponse> getAllMaterials() {
+            List<MaterialDomain> materialList = materialRepository.findAll();
+            return materialConverter.convertMaterialDomainListToResponseList(materialList);
+        }
+
+        // GET BY ID
+        public MaterialResponse getMaterialById(String id) {
+            Optional<MaterialDomain> materialDomain = materialRepository.findById(id);
+            return materialDomain.map(materialConverter::convertMaterialDomainToResponse)
+                    .orElseThrow(() -> new InvalidDataException("Material não encontrado pelo ID: " + id));
+        }
+
+        // UPDATE
+        public MaterialResponse updateMaterial(String id, MaterialRequest materialRequest) {
+            try {
+                if (materialRequest == null) {
+                    throw new InvalidDataException("Requisição do material não pode ser nula.");
+                }
+                MaterialDomain materialDomain = materialConverter.convertMaterialRequestToDomain(materialRequest);
+                materialDomain.setId(id);
+                MaterialDomain updatedMaterial = materialRepository.save(materialDomain);
+                return materialConverter.convertMaterialDomainToResponse(updatedMaterial);
+            } catch (InvalidDataException e) {
+                throw new InvalidMaterialDataException("Falha ao atualizar o material com o ID: " + id);
+            }
+        }
+
+        // DELETE
+        public void deleteMaterial(String id) {
+            try {
+                materialRepository.deleteById(id);
+            } catch (EmptyResultDataAccessException e) {
+                throw new InvalidMaterialDataException("Material não encontrado através do ID: " + id);
+            } catch (DataIntegrityViolationException e) {
+                throw new InvalidMaterialDataException("Erro ao deletar material com o ID: " + id + " - " + e.getMessage());
+            }
+        }
+
+        // CREATE
         public MaterialResponse registerMaterial(MaterialRequest materialRequest) {
             try {
                 // Validação dos dados

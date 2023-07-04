@@ -1,27 +1,24 @@
 package mapping;
 
-import model.Lote.LoteDomain;
-import model.Lote.LoteRequest;
-import model.Lote.LoteResponse;
 import model.Material.MaterialDomain;
 import model.Material.MaterialRequest;
 import model.Material.MaterialResponse;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MaterialConverter {
 
-    public MaterialResponse convertMaterialDomainToResponse(MaterialDomain materialDomain) {
-        List<LoteResponse> loteResponseList = convertLoteDomainListToResponseList(materialDomain.getLoteDomainList());
+    private LoteConverter loteConverter;
 
+    public MaterialResponse convertMaterialDomainToResponse(MaterialDomain materialDomain) {
         return MaterialResponse.builder()
                 .id(materialDomain.getId())
                 .name(materialDomain.getName())
                 .quantity(materialDomain.getQuantity())
                 .unitMeasure(materialDomain.getUnitMeasure())
                 .cost(materialDomain.getCost())
-                .loteResponseList(loteResponseList)
+                .loteResponseList(loteConverter.convertLoteDomainListToResponseList(materialDomain.getLoteDomainList()))
                 .build();
     }
 
@@ -37,20 +34,11 @@ public class MaterialConverter {
 
     // Lists
 
-    private List<LoteResponse> convertLoteDomainListToResponseList(List<LoteDomain> loteDomainList) {
-        List<LoteResponse> loteResponseList = new ArrayList<>();
-
-        for (LoteDomain loteDomain : loteDomainList) {
-            LoteResponse loteResponse = LoteResponse.builder()
-                    .id(loteDomain.getId())
-                    .amountConsumed(loteDomain.getAmountConsumed())
-                    .totalCost(loteDomain.getTotalCost())
-                    .validity(loteDomain.getValidity())
-                    .build();
-
-            loteResponseList.add(loteResponse);
-        }
-
-        return loteResponseList;
+    public List<MaterialResponse> convertMaterialDomainListToResponseList(List<MaterialDomain> materialDomainList) {
+        return materialDomainList.stream()
+                .map(this::convertMaterialDomainToResponse)
+                .collect(Collectors.toList());
     }
+
+
 }

@@ -4,6 +4,9 @@ import model.Lote.LoteDomain;
 import model.Lote.LoteRequest;
 import model.Lote.LoteResponse;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class LoteConverter {
 
     public LoteDomain convertLoteRequestToDomain(LoteRequest loteRequest) {
@@ -21,7 +24,14 @@ public class LoteConverter {
                 .amountConsumed(loteDomain.getAmountConsumed())
                 .totalCost(loteDomain.getTotalCost())
                 .validity(loteDomain.getValidity())
-                .materialDomain(loteDomain.getMaterialDomain())
                 .build();
+    }
+
+    //Lists
+
+    public List<LoteResponse> convertLoteDomainListToResponseList(List<LoteDomain> loteDomainList) {
+        return loteDomainList.stream()
+                .map(this::convertLoteDomainToResponse)
+                .collect(Collectors.toList());
     }
 }
