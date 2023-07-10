@@ -82,9 +82,9 @@ public class MaterialService {
                 // Validação dos dados
                 validateMaterialRequest(materialRequest);
 
-                if (materialRepository.existsByName(materialRequest.getName())) {
-                    // Obter o material existente pelo nome
-                    MaterialDomain existingMaterial = materialRepository.findByName(materialRequest.getName());
+                MaterialDomain existingMaterial = materialRepository.findByName(materialRequest.getName());
+
+                if (existingMaterial != null) {
 
                     // Obter a quantidade atual do material e somar no db
                     double currentQuantity = existingMaterial.getQuantity();
@@ -92,52 +92,33 @@ public class MaterialService {
 
                     existingMaterial.setQuantity(newQuantity);
 
-                    materialRepository.save(existingMaterial);
-
-                    // Criação de um lote para o material
-                    LoteDomain loteDomain = loteService.createLote(materialRequest, existingMaterial);
-
-                    // Associação do lote ao material
-                    List<LoteDomain> loteDomainList = existingMaterial.getLoteDomainList();
-                    if (loteDomainList == null) {
-                        loteDomainList = new ArrayList<>();
-                        existingMaterial.setLoteDomainList(loteDomainList);
-                    }
-                    loteDomainList.add(loteDomain);
-
-                    // Atualizando o material no banco de dados com a associação ao lote
-                    existingMaterial = materialRepository.save(existingMaterial);
-
-                    // Convertendo o domínio para a resposta
-                    return materialConverter.convertMaterialDomainToResponse(existingMaterial);
-
                 } else {
 
                     // Convertendo a requisição para o domínio
-                    MaterialDomain materialDomain = materialConverter.convertMaterialRequestToDomain(materialRequest);
-
-                    // Salvando o material no banco de dados
-                    materialDomain = materialRepository.save(materialDomain);
-
-                    // Criação de um lote para o material
-                    LoteDomain loteDomain = loteService.createLote(materialRequest, materialDomain);
-
-                    // Associação do lote ao material
-                    List<LoteDomain> loteDomainList = materialDomain.getLoteDomainList();
-                    if (loteDomainList == null) {
-                        loteDomainList = new ArrayList<>();
-                        materialDomain.setLoteDomainList(loteDomainList);
-                    }
-                    loteDomainList.add(loteDomain);
-
-                    // Atualizando o material no banco de dados com a associação ao lote
-                    materialDomain = materialRepository.save(materialDomain);
-
-                    // Convertendo o domínio para a resposta
-                    return materialConverter.convertMaterialDomainToResponse(materialDomain);
-
-
+                    existingMaterial = materialConverter.convertMaterialRequestToDomain(materialRequest);
                 }
+
+                existingMaterial = materialRepository.save(existingMaterial);
+
+                // Criação de um lote para o material
+                LoteDomain loteDomain = loteService.createLote(materialRequest, existingMaterial);
+
+                // Associação do lote ao material
+                List<LoteDomain> loteDomainList = existingMaterial.getLoteDomainList();
+
+                if (loteDomainList == null) {
+                    loteDomainList = new ArrayList<>();
+                    existingMaterial.setLoteDomainList(loteDomainList);
+                }
+                loteDomainList.add(loteDomain);
+
+                // Atualizando o material no banco de dados com a associação ao lote
+                existingMaterial = materialRepository.save(existingMaterial);
+
+                // Convertendo o domínio para a resposta
+                return materialConverter.convertMaterialDomainToResponse(existingMaterial);
+
+
             } catch(InvalidDataException e){
                 // Se os dados forem inválidos, lance uma exceção personalizada
                 throw new InvalidMaterialDataException(e.getMessage());
