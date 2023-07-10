@@ -4,10 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.project.cafeteriaManagementSystem.model.Material.MaterialDomain;
 
-import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Builder
 @AllArgsConstructor
@@ -15,8 +13,5 @@ import java.util.Date;
 @Data
 public class LoteRequest {
 
-    private Double amountConsumed;
-    private BigDecimal totalCost;
-    private Date validity;
-    private MaterialDomain materialDomain;
+    private LocalDate validity;
 }

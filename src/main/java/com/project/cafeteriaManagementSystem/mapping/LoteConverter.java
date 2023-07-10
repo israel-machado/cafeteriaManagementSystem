@@ -1,22 +1,14 @@
 package com.project.cafeteriaManagementSystem.mapping;
 
 import com.project.cafeteriaManagementSystem.model.Lote.LoteDomain;
-import com.project.cafeteriaManagementSystem.model.Lote.LoteRequest;
 import com.project.cafeteriaManagementSystem.model.Lote.LoteResponse;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
 public class LoteConverter {
-
-    public LoteDomain convertLoteRequestToDomain(LoteRequest loteRequest) {
-        return LoteDomain.builder()
-                .amountConsumed(loteRequest.getAmountConsumed())
-                .totalCost(loteRequest.getTotalCost())
-                .validity(loteRequest.getValidity())
-                .materialDomain(loteRequest.getMaterialDomain())
-                .build();
-    }
 
     public LoteResponse convertLoteDomainToResponse(LoteDomain loteDomain) {
         return LoteResponse.builder()

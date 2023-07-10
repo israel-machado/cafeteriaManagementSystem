@@ -5,35 +5,37 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.project.cafeteriaManagementSystem.exceptions.InsufficientMaterialStockException;
+import com.project.cafeteriaManagementSystem.exceptions.InsufficientStockException;
+import com.project.cafeteriaManagementSystem.exceptions.InvalidDataException;
 import com.project.cafeteriaManagementSystem.exceptions.InvalidMaterialDataException;
+import com.project.cafeteriaManagementSystem.mapping.MaterialConverter;
 import com.project.cafeteriaManagementSystem.model.Lote.LoteDomain;
 import com.project.cafeteriaManagementSystem.model.Lote.LoteRequest;
 import com.project.cafeteriaManagementSystem.model.Material.MaterialDomain;
-import com.project.cafeteriaManagementSystem.exceptions.InsufficientStockException;
-import com.project.cafeteriaManagementSystem.exceptions.InvalidDataException;
-import com.project.cafeteriaManagementSystem.mapping.MaterialConverter;
 import com.project.cafeteriaManagementSystem.model.Material.MaterialRequest;
 import com.project.cafeteriaManagementSystem.model.Material.MaterialResponse;
+import com.project.cafeteriaManagementSystem.repository.MaterialRepository;
+import lombok.RequiredArgsConstructor;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
-import com.project.cafeteriaManagementSystem.repository.MaterialRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class MaterialService {
 
-        private MaterialConverter materialConverter;
-        private MaterialRepository materialRepository;
-        private LoteService loteService;
+        private final MaterialConverter materialConverter;
+        private final MaterialRepository materialRepository;
+        private final LoteService loteService;
 
         // GET ALL
         public List<MaterialResponse> getAllMaterials() {
@@ -90,7 +92,12 @@ public class MaterialService {
                 LoteDomain loteDomain = loteService.createLote(materialRequest, materialDomain);
 
                 // Associação do lote ao material
-                materialDomain.getLoteDomainList().add(loteDomain);
+                List<LoteDomain> loteDomainList = materialDomain.getLoteDomainList();
+                if(loteDomainList == null) {
+                    loteDomainList = new ArrayList<>();
+                    materialDomain.setLoteDomainList(loteDomainList);
+                }
+                loteDomainList.add(loteDomain);
 
                 // Atualizando o material no banco de dados com a associação ao lote
                 materialDomain = materialRepository.save(materialDomain);
@@ -149,7 +156,7 @@ public class MaterialService {
             LocalDate currentDate = LocalDate.now();
 
             // Converter a data de validade do lote para LocalDate
-            LocalDate expirationDate = loteRequest.getValidity().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate expirationDate = materialRequest.getLoteRequest().getValidity();
 
             // Calcular a diferença em dias entre a data atual e a data de validade
             long daysUntilExpiration = ChronoUnit.DAYS.between(currentDate, expirationDate);
@@ -171,15 +178,12 @@ public class MaterialService {
         }
 
     private long getAvailableStock(String id) {
-        // Criar a conexão com o MongoDB
         try (MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017")) {
-            // Obter a referência para o banco de dados desejado
-            MongoDatabase database = mongoClient.getDatabase("nome_do_banco_de_dados");
+            // Criar conexão com o MongoDB
+            MongoDatabase database = mongoClient.getDatabase("nome_do_banco_de_dados"); // Substitua pelo nome do seu banco de dados
+            MongoCollection<Document> collection = database.getCollection("nome_da_colecao_de_materiais"); // Substitua pelo nome da coleção de materiais
 
-            // Obter a referência para a coleção de materiais
-            MongoCollection<Document> collection = database.getCollection("nome_da_colecao_de_materiais");
-
-            // Criar o filtro para buscar o documento do material pelo ID
+            // Criar filtro para buscar o documento do material pelo ID
             Document filter = new Document("_id", new ObjectId(id));
 
             // Executar a consulta para obter o documento do material
@@ -188,7 +192,6 @@ public class MaterialService {
             if (materialDocument != null) {
                 // Extrair a quantidade disponível do documento do material
                 long availableStock = materialDocument.getLong("stock");
-
                 return availableStock;
             } else {
                 // O material não foi encontrado

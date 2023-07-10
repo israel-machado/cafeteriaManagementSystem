@@ -3,13 +3,17 @@ package com.project.cafeteriaManagementSystem.mapping;
 import com.project.cafeteriaManagementSystem.model.Material.MaterialDomain;
 import com.project.cafeteriaManagementSystem.model.Material.MaterialRequest;
 import com.project.cafeteriaManagementSystem.model.Material.MaterialResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
+@RequiredArgsConstructor
 public class MaterialConverter {
 
-    private LoteConverter loteConverter;
+    private final LoteConverter loteConverter;
 
     public MaterialResponse convertMaterialDomainToResponse(MaterialDomain materialDomain) {
         return MaterialResponse.builder()
