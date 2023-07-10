@@ -28,8 +28,8 @@ public class MaterialController {
     }
 
     @PostMapping
-    public ResponseEntity<MaterialResponse> createMaterial(@RequestBody MaterialRequest materialRequest) {
-        MaterialResponse materialResponse = materialService.createMaterial(materialRequest);
+    public ResponseEntity<MaterialResponse> insertMaterial(@RequestBody MaterialRequest materialRequest) {
+        MaterialResponse materialResponse = materialService.insertMaterial(materialRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(materialResponse);
     }
 

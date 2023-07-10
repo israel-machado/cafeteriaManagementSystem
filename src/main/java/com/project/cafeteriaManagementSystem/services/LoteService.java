@@ -21,12 +21,9 @@ public class LoteService {
         // Calculando o custo total com base nos dados do material
         BigDecimal calculatedTotalCost = calculateTotalCost(materialRequest);
 
-        // Quantidade consumida iniciada em 0
-        Double initialAmountConsumed = 0.0;
-
         // Criando o objeto LoteDomain com as informações calculadas e o MaterialDomain associado
         LoteDomain loteDomain = LoteDomain.builder()
-                .amountConsumed(initialAmountConsumed)
+                .amountToBeConsumed(materialRequest.getQuantity())
                 .totalCost(calculatedTotalCost)
                 .validity(materialRequest.getLoteRequest().getValidity())
                 .materialDomain(materialDomain)

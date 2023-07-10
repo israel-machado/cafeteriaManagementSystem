@@ -76,39 +76,72 @@ public class MaterialService {
             }
         }
 
-        // CREATE
-        public MaterialResponse createMaterial(MaterialRequest materialRequest) {
+        // INSERT
+        public MaterialResponse insertMaterial(MaterialRequest materialRequest) {
             try {
                 // Validação dos dados
                 validateMaterialRequest(materialRequest);
 
-                // Convertendo a requisição para o domínio
-                MaterialDomain materialDomain = materialConverter.convertMaterialRequestToDomain(materialRequest);
+                if (materialRepository.existsByName(materialRequest.getName())) {
+                    // Obter o material existente pelo nome
+                    MaterialDomain existingMaterial = materialRepository.findByName(materialRequest.getName());
 
-                // Salvando o material no banco de dados
-                materialDomain = materialRepository.save(materialDomain);
+                    // Obter a quantidade atual do material e somar no db
+                    double currentQuantity = existingMaterial.getQuantity();
+                    double newQuantity = currentQuantity + materialRequest.getQuantity();
 
-                // Criação de um lote para o material
-                LoteDomain loteDomain = loteService.createLote(materialRequest, materialDomain);
+                    existingMaterial.setQuantity(newQuantity);
 
-                // Associação do lote ao material
-                List<LoteDomain> loteDomainList = materialDomain.getLoteDomainList();
-                if(loteDomainList == null) {
-                    loteDomainList = new ArrayList<>();
-                    materialDomain.setLoteDomainList(loteDomainList);
+                    materialRepository.save(existingMaterial);
+
+                    // Criação de um lote para o material
+                    LoteDomain loteDomain = loteService.createLote(materialRequest, existingMaterial);
+
+                    // Associação do lote ao material
+                    List<LoteDomain> loteDomainList = existingMaterial.getLoteDomainList();
+                    if (loteDomainList == null) {
+                        loteDomainList = new ArrayList<>();
+                        existingMaterial.setLoteDomainList(loteDomainList);
+                    }
+                    loteDomainList.add(loteDomain);
+
+                    // Atualizando o material no banco de dados com a associação ao lote
+                    existingMaterial = materialRepository.save(existingMaterial);
+
+                    // Convertendo o domínio para a resposta
+                    return materialConverter.convertMaterialDomainToResponse(existingMaterial);
+
+                } else {
+
+                    // Convertendo a requisição para o domínio
+                    MaterialDomain materialDomain = materialConverter.convertMaterialRequestToDomain(materialRequest);
+
+                    // Salvando o material no banco de dados
+                    materialDomain = materialRepository.save(materialDomain);
+
+                    // Criação de um lote para o material
+                    LoteDomain loteDomain = loteService.createLote(materialRequest, materialDomain);
+
+                    // Associação do lote ao material
+                    List<LoteDomain> loteDomainList = materialDomain.getLoteDomainList();
+                    if (loteDomainList == null) {
+                        loteDomainList = new ArrayList<>();
+                        materialDomain.setLoteDomainList(loteDomainList);
+                    }
+                    loteDomainList.add(loteDomain);
+
+                    // Atualizando o material no banco de dados com a associação ao lote
+                    materialDomain = materialRepository.save(materialDomain);
+
+                    // Convertendo o domínio para a resposta
+                    return materialConverter.convertMaterialDomainToResponse(materialDomain);
+
+
                 }
-                loteDomainList.add(loteDomain);
-
-                // Atualizando o material no banco de dados com a associação ao lote
-                materialDomain = materialRepository.save(materialDomain);
-
-                // Convertendo o domínio para a resposta
-                return materialConverter.convertMaterialDomainToResponse(materialDomain);
-
-            } catch (InvalidDataException e) {
+            } catch(InvalidDataException e){
                 // Se os dados forem inválidos, lance uma exceção personalizada
                 throw new InvalidMaterialDataException(e.getMessage());
-            } catch (InsufficientStockException e) {
+            } catch(InsufficientStockException e){
                 // Se houver estoque insuficiente, lance uma exceção personalizada
                 throw new InsufficientMaterialStockException(e.getMessage());
             }
@@ -122,11 +155,6 @@ public class MaterialService {
             // Verificar se o nome do material está preenchido ----- NOME
             if (materialRequest.getName() == null || materialRequest.getName().isEmpty()) {
                 throw new InvalidDataException("O nome do material é obrigatório");
-            }
-
-            // Verificar se o material já existe pelo nome --- IF EXISTS
-            if (materialRepository.existsByName(materialRequest.getName())) {
-                throw new InvalidDataException("O material já existe");
             }
 
             // Verificar se a quantidade do material é válida --- QUANTIDADE
@@ -167,21 +195,16 @@ public class MaterialService {
             }
         }
 
-        private void checkStockAvailability(MaterialRequest materialRequest) {
-//            // Verificar a disponibilidade de estoque para a quantidade solicitada do material
-//            // Se não houver estoque suficiente, lance uma exceção InsufficientStockException com a mensagem adequada
-//            BigDecimal wantedQuantity = BigDecimal.valueOf(materialRequest.getQuantity());
-//            BigDecimal availableStock = getAvailableStock(materialRequest);
-//            if (wantedQuantity.compareTo(availableStock) > 0) {
-//                throw new InsufficientStockException("Estoque insuficiente para o material");
+//        private void checkStockAvailability(MaterialRequest materialRequest) {
+//            Fazer quando tiver fazendo a parte da venda
 //            }
-        }
+//        }
 
-    private long getAvailableStock(String id) {
+    private double getAvailableStock(String id) {
         try (MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017")) {
             // Criar conexão com o MongoDB
-            MongoDatabase database = mongoClient.getDatabase("nome_do_banco_de_dados"); // Substitua pelo nome do seu banco de dados
-            MongoCollection<Document> collection = database.getCollection("nome_da_colecao_de_materiais"); // Substitua pelo nome da coleção de materiais
+            MongoDatabase database = mongoClient.getDatabase("cafeteria_db"); // Nome do seu banco de dados
+            MongoCollection<Document> collection = database.getCollection("materiais"); // Nome da coleção de materiais
 
             // Criar filtro para buscar o documento do material pelo ID
             Document filter = new Document("_id", new ObjectId(id));
@@ -190,9 +213,11 @@ public class MaterialService {
             Document materialDocument = collection.find(filter).first();
 
             if (materialDocument != null) {
-                // Extrair a quantidade disponível do documento do material
-                long availableStock = materialDocument.getLong("stock");
-                return availableStock;
+                // Extrair a quantidade do material do documento
+                double quantity = materialDocument.getDouble("quantity");
+
+                // Retornar a quantidade disponível
+                return quantity;
             } else {
                 // O material não foi encontrado
                 return 0;

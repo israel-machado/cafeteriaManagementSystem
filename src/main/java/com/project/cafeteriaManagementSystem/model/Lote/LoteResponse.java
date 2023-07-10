@@ -16,7 +16,7 @@ import java.time.LocalDate;
 public class LoteResponse {
 
     private String id;
-    private Double amountConsumed;
+    private Double amountToBeConsumed;
     private BigDecimal totalCost;
     private LocalDate validity;
     private MaterialDomain materialDomain;

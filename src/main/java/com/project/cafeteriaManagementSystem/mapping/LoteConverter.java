@@ -13,7 +13,7 @@ public class LoteConverter {
     public LoteResponse convertLoteDomainToResponse(LoteDomain loteDomain) {
         return LoteResponse.builder()
                 .id(loteDomain.getId())
-                .amountConsumed(loteDomain.getAmountConsumed())
+                .amountToBeConsumed(loteDomain.getAmountToBeConsumed())
                 .totalCost(loteDomain.getTotalCost())
                 .validity(loteDomain.getValidity())
                 .build();

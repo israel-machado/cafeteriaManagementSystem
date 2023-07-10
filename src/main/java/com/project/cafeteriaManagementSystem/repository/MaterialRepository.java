@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface MaterialRepository extends MongoRepository<MaterialDomain, String> {
 
     boolean existsByName(String name);
+    boolean existsById(String id);
+    MaterialDomain findByName(String name);
 }
