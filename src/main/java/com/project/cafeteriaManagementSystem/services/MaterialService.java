@@ -79,8 +79,6 @@ public class MaterialService {
         // INSERT
         public MaterialResponse insertMaterial(MaterialRequest materialRequest) {
             try {
-                // Validação dos dados
-                validateMaterialRequest(materialRequest);
 
                 MaterialDomain existingMaterial = materialRepository.findByName(materialRequest.getName());
 
@@ -88,7 +86,7 @@ public class MaterialService {
 
                     // Obter a quantidade atual do material e somar no db
                     double currentQuantity = existingMaterial.getQuantity();
-                    double newQuantity = currentQuantity + materialRequest.getQuantity();
+                    double newQuantity = materialRequest.getQuantity() + currentQuantity;
 
                     existingMaterial.setQuantity(newQuantity);
 
@@ -128,56 +126,8 @@ public class MaterialService {
             }
         }
 
-        private void validateMaterialRequest(MaterialRequest materialRequest) {
-            // Realize as validações necessárias nos dados do materialRequest
-            // Verifique se os campos obrigatórios estão preenchidos,
-            // Se os valores estão corretos, etc. Se alguma validação falhar, lance uma exceção InvalidDataException com a mensagem adequada.
-
-            // Verificar se o nome do material está preenchido ----- NOME
-            if (materialRequest.getName() == null || materialRequest.getName().isEmpty()) {
-                throw new InvalidDataException("O nome do material é obrigatório");
-            }
-
-            // Verificar se a quantidade do material é válida --- QUANTIDADE
-            if (materialRequest.getQuantity() == null || materialRequest.getQuantity() <= 0) {
-                throw new InvalidDataException("A quantidade do material deve ser maior que zero");
-            }
-
-            // Verificar se a unidade de medida do material está preenchida --- UNIDADE DE MEDIDA
-            if (materialRequest.getUnitMeasure() == null || materialRequest.getUnitMeasure().isEmpty()) {
-                throw new InvalidDataException("A unidade de medida do material é obrigatória");
-            }
-
-            // Verificar se o custo do material é válido --- CUSTO
-            if (materialRequest.getCost() == null || materialRequest.getCost().compareTo(BigDecimal.ZERO) <= 0) {
-                throw new InvalidDataException("O custo do material deve ser maior que zero");
-            }
-
-            // Verificar se as informações do lote estão preenchidas corretamente, se aplicável --- LOTE
-            LoteRequest loteRequest = materialRequest.getLoteRequest();
-
-            // Verificar se a data de validade do lote é válida
-            if (loteRequest.getValidity() == null) {
-                throw new InvalidDataException("A data de validade do lote é obrigatória");
-            }
-
-            // Obter a data atual
-            LocalDate currentDate = LocalDate.now();
-
-            // Converter a data de validade do lote para LocalDate
-            LocalDate expirationDate = materialRequest.getLoteRequest().getValidity();
-
-            // Calcular a diferença em dias entre a data atual e a data de validade
-            long daysUntilExpiration = ChronoUnit.DAYS.between(currentDate, expirationDate);
-
-            // Verificar se a diferença é menor que 7 dias
-            if (daysUntilExpiration < 7) {
-                throw new InvalidDataException("A data de validade é menor que uma semana.");
-            }
-        }
-
 //        private void checkStockAvailability(MaterialRequest materialRequest) {
-//            Fazer quando tiver fazendo a parte da venda
+//            //TODO Fazer quando tiver fazendo a parte da venda
 //            }
 //        }
 

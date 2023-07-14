@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.project.cafeteriaManagementSystem.services.MaterialService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -28,7 +29,7 @@ public class MaterialController {
     }
 
     @PostMapping
-    public ResponseEntity<MaterialResponse> insertMaterial(@RequestBody MaterialRequest materialRequest) {
+    public ResponseEntity<MaterialResponse> insertMaterial(@Valid @RequestBody MaterialRequest materialRequest) {
         MaterialResponse materialResponse = materialService.insertMaterial(materialRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(materialResponse);
     }
@@ -43,5 +44,4 @@ public class MaterialController {
         materialService.deleteMaterial(id);
         return ResponseEntity.noContent().build();
     }
-
 }
