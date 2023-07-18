@@ -47,4 +47,13 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorDetail);
     }
+
+    @ExceptionHandler(InvalidMaterialDataException.class)
+    public ResponseEntity<ErrorDetail> handleInvalidMenuItemDataException(InvalidMenuItemDataException ex) {
+        ErrorDetail errorDetail = new ErrorDetail();
+        errorDetail.setStatusCode(HttpStatus.BAD_REQUEST.value());
+        errorDetail.setMessage("Invalid menu item data: " + ex.getMessage());
+
+        return ResponseEntity.badRequest().body(errorDetail);
+    }
 }
