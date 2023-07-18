@@ -31,6 +31,13 @@ public class MenuItemService {
         return menuItemConverter.convertMenuItemDomainListToResponse(menuItemDomainList);
     }
 
+    //GET BY ID
+    public MenuItemResponse getMenuItemById(String id) {
+        MenuItemDomain menuItemDomain = menuItemRepository.findById(id)
+                .orElseThrow(() -> new InvalidMenuItemDataException("Menu do Cardápio não encontrado pelo ID: " + id));
+        return menuItemConverter.convertMenuItemDomainToResponse(menuItemDomain);
+    }
+
     //CREATE
     public MenuItemResponse createMenuItem(MenuItemRequest menuItemRequest) {
         List<MaterialDomain> materialDomainList = new ArrayList<>();

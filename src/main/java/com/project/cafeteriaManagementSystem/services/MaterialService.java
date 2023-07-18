@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -41,9 +40,9 @@ public class MaterialService {
 
         // GET BY ID
         public MaterialResponse getMaterialById(String id) {
-            Optional<MaterialDomain> materialDomain = materialRepository.findById(id);
-            return materialDomain.map(materialConverter::convertMaterialDomainToResponse)
+            MaterialDomain materialDomain = materialRepository.findById(id)
                     .orElseThrow(() -> new InvalidDataException("Material não encontrado pelo ID: " + id));
+            return materialConverter.convertMaterialDomainToResponse(materialDomain);
         }
 
         // UPDATE
