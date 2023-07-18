@@ -43,6 +43,4 @@ public class MaterialConverter {
                 .map(this::convertMaterialDomainToResponse)
                 .collect(Collectors.toList());
     }
-
-
 }

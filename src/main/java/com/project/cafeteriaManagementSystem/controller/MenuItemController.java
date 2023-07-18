@@ -1,5 +1,6 @@
 package com.project.cafeteriaManagementSystem.controller;
 
+import com.project.cafeteriaManagementSystem.model.Material.MaterialResponse;
 import com.project.cafeteriaManagementSystem.model.MenuItem.MenuItemRequest;
 import com.project.cafeteriaManagementSystem.model.MenuItem.MenuItemResponse;
 import com.project.cafeteriaManagementSystem.services.MenuItemService;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/menu-item")
@@ -17,6 +19,11 @@ public class MenuItemController {
     @Autowired
     private MenuItemService menuItemService;
 
+    @GetMapping
+    public ResponseEntity<List<MenuItemResponse>> getAll() {
+        return ResponseEntity.ok().body(menuItemService.getAllMenu());
+    }
+    
     @PostMapping
     public ResponseEntity<MenuItemResponse> insertMenuItem(@Valid @RequestBody MenuItemRequest menuItemRequest) {
         MenuItemResponse menuItemResponse = menuItemService.createMenuItem(menuItemRequest);

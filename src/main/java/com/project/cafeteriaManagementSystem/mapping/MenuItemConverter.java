@@ -7,6 +7,7 @@ import com.project.cafeteriaManagementSystem.model.MenuItem.MenuItemResponse;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class MenuItemConverter {
@@ -26,5 +27,13 @@ public class MenuItemConverter {
                 .saleValue(menuItemDomain.getSaleValue())
                 .materialsRecipe(menuItemDomain.getMaterialsRecipe())
                 .build();
+    }
+
+    //LIST
+
+    public List<MenuItemResponse> convertMenuItemDomainListToResponse(List<MenuItemDomain> menuItemDomainList) {
+        return menuItemDomainList.stream()
+                .map(this::convertMenuItemDomainToResponse)
+                .collect(Collectors.toList());
     }
 }

@@ -25,6 +25,12 @@ public class MenuItemService {
     private final MaterialRepository materialRepository;
     private final MenuItemConverter menuItemConverter;
 
+    //GET ALL
+    public List<MenuItemResponse> getAllMenu() {
+        List<MenuItemDomain> menuItemDomainList = menuItemRepository.findAll();
+        return menuItemConverter.convertMenuItemDomainListToResponse(menuItemDomainList);
+    }
+
     //CREATE
     public MenuItemResponse createMenuItem(MenuItemRequest menuItemRequest) {
         List<MaterialDomain> materialDomainList = new ArrayList<>();
