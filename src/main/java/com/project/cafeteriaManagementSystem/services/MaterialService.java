@@ -10,7 +10,6 @@ import com.project.cafeteriaManagementSystem.exceptions.InvalidDataException;
 import com.project.cafeteriaManagementSystem.exceptions.InvalidMaterialDataException;
 import com.project.cafeteriaManagementSystem.mapping.MaterialConverter;
 import com.project.cafeteriaManagementSystem.model.Lote.LoteDomain;
-import com.project.cafeteriaManagementSystem.model.Lote.LoteRequest;
 import com.project.cafeteriaManagementSystem.model.Material.MaterialDomain;
 import com.project.cafeteriaManagementSystem.model.Material.MaterialRequest;
 import com.project.cafeteriaManagementSystem.model.Material.MaterialResponse;
@@ -22,9 +21,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -123,6 +119,30 @@ public class MaterialService {
             } catch(InsufficientStockException e){
                 // Se houver estoque insuficiente, lance uma exceção personalizada
                 throw new InsufficientMaterialStockException(e.getMessage());
+            }
+        }
+
+        public MaterialResponse insertMaterialWithOutLote(MaterialRequest materialRequest) {
+            try {
+
+                MaterialDomain existingMaterial = materialRepository.findByName(materialRequest.getName());
+
+                if (existingMaterial != null) {
+                    throw new InvalidMaterialDataException("Material já existe no banco de dados.");
+
+                } else {
+                    // Convertendo a requisição para o domínio
+                    existingMaterial = materialConverter.convertMaterialRequestToDomain(materialRequest);
+                }
+
+                existingMaterial = materialRepository.save(existingMaterial);
+
+                // Convertendo o domínio para a resposta
+                return materialConverter.convertMaterialDomainToResponse(existingMaterial);
+
+            } catch(InvalidDataException e){
+                // Se os dados forem inválidos, lance uma exceção personalizada
+                throw new InvalidMaterialDataException(e.getMessage());
             }
         }
 

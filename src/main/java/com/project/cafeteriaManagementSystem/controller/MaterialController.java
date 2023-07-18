@@ -34,6 +34,12 @@ public class MaterialController {
         return ResponseEntity.status(HttpStatus.CREATED).body(materialResponse);
     }
 
+    @PostMapping("/register-db")
+    public ResponseEntity<MaterialResponse> insertMaterialWithOutLote(@Valid @RequestBody MaterialRequest materialRequest) {
+        MaterialResponse materialResponse = materialService.insertMaterialWithOutLote(materialRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(materialResponse);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<MaterialResponse> updateMaterial(@PathVariable String id, @RequestBody MaterialRequest materialRequest) {
         return ResponseEntity.ok().body(materialService.updateMaterial(id, materialRequest));
