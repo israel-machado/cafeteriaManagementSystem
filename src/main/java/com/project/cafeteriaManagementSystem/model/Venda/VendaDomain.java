@@ -23,8 +23,10 @@ public class VendaDomain {
     @Id
     private String id;
     private BigDecimal saleValue;
+
     @DBRef
     private MenuItemDomain menuItemDomain;
+
     @DBRef
     private List<MaterialDomain> materialsConsumed;
 }

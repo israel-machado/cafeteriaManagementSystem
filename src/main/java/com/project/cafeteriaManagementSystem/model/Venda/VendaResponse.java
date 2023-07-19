@@ -1,7 +1,7 @@
 package com.project.cafeteriaManagementSystem.model.Venda;
 
-import com.project.cafeteriaManagementSystem.model.Material.MaterialDomain;
-import com.project.cafeteriaManagementSystem.model.MenuItem.MenuItemDomain;
+import com.project.cafeteriaManagementSystem.model.Material.MaterialResponse;
+import com.project.cafeteriaManagementSystem.model.MenuItem.MenuItemResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,9 +15,8 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 public class VendaResponse {
-
     private String id;
     private BigDecimal saleValue;
-    private MenuItemDomain menuItemDomain;
-    private List<MaterialDomain> materialsConsumed;
+    private MenuItemResponse menuItem;
+    private List<MaterialResponse> materialsConsumed;
 }
