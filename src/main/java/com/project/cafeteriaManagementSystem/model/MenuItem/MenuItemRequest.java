@@ -5,10 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -27,4 +24,9 @@ public class MenuItemRequest {
 
     @NotEmpty(message = "A lista de materiais não pode estar vazia")
     private List<String> materialsRecipeNames;
+
+    @NotNull(message = "A taxa de lucro deve ser informada")
+    @DecimalMin(value = "0.10", message = "A taxa de lucro mínima é de 10%")
+    @DecimalMax(value = "1.00", message = "A taxa de lucro máxima é de 100%")
+    private BigDecimal profitMargin;
 }

@@ -23,6 +23,7 @@ public class MenuItemDomain {
     private String id;
     private String name;
     private BigDecimal saleValue;
+    private BigDecimal profitMargin;
     @DBRef
     private List<MaterialDomain> materialsRecipe;
 }

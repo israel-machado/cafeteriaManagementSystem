@@ -4,18 +4,23 @@ import com.project.cafeteriaManagementSystem.model.Material.MaterialDomain;
 import com.project.cafeteriaManagementSystem.model.MenuItem.MenuItemDomain;
 import com.project.cafeteriaManagementSystem.model.MenuItem.MenuItemRequest;
 import com.project.cafeteriaManagementSystem.model.MenuItem.MenuItemResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class MenuItemConverter {
 
-    public MenuItemDomain convertMenuItemRequestToDomain(MenuItemRequest menuItemRequest, List<MaterialDomain> materialDomainList) {
+    private final MaterialConverter materialConverter;
+
+    public MenuItemDomain convertMenuItemRequestToDomain(MenuItemRequest menuItemRequest, List<MaterialDomain> materialDomainList, BigDecimal totalCostWithProfit) {
         return MenuItemDomain.builder()
                 .name(menuItemRequest.getName())
-                .saleValue(menuItemRequest.getSaleValue())
+                .saleValue(totalCostWithProfit)
                 .materialsRecipe(materialDomainList)
                 .build();
     }
@@ -25,7 +30,7 @@ public class MenuItemConverter {
                 .id(menuItemDomain.getId())
                 .name(menuItemDomain.getName())
                 .saleValue(menuItemDomain.getSaleValue())
-                .materialsRecipe(menuItemDomain.getMaterialsRecipe())
+                .materialsRecipe(materialConverter.convertMaterialDomainListToResponseList(menuItemDomain.getMaterialsRecipe()))
                 .build();
     }
 

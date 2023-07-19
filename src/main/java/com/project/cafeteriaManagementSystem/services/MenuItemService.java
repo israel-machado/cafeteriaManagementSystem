@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,7 +52,17 @@ public class MenuItemService {
             }
         }
 
-        MenuItemDomain menuItemDomain = menuItemConverter.convertMenuItemRequestToDomain(menuItemRequest, materialDomainList);
+        // Cálculo do custo total dos materiais
+        BigDecimal totalMaterialCost = BigDecimal.ZERO;
+        for (MaterialDomain material : materialDomainList) {
+            totalMaterialCost = totalMaterialCost.add(material.getCost());
+        }
+
+        // Aplicar a taxa de lucro
+        BigDecimal profitMargin = menuItemRequest.getProfitMargin(); // Taxa de lucro informada na requisição
+        BigDecimal totalCostWithProfit = totalMaterialCost.multiply(BigDecimal.ONE.add(profitMargin));
+
+        MenuItemDomain menuItemDomain = menuItemConverter.convertMenuItemRequestToDomain(menuItemRequest, materialDomainList, totalCostWithProfit);
 
         menuItemRepository.save(menuItemDomain);
 
