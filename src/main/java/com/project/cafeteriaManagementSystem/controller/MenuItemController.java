@@ -1,6 +1,7 @@
 package com.project.cafeteriaManagementSystem.controller;
 
 import com.project.cafeteriaManagementSystem.model.Material.MaterialResponse;
+import com.project.cafeteriaManagementSystem.model.MenuItem.MenuItemDetailedResponse;
 import com.project.cafeteriaManagementSystem.model.MenuItem.MenuItemRequest;
 import com.project.cafeteriaManagementSystem.model.MenuItem.MenuItemResponse;
 import com.project.cafeteriaManagementSystem.services.MenuItemService;
@@ -22,6 +23,16 @@ public class MenuItemController {
     @GetMapping
     public ResponseEntity<List<MenuItemResponse>> getAll() {
         return ResponseEntity.ok().body(menuItemService.getAllMenu());
+    }
+
+    @GetMapping("/customers")
+    public ResponseEntity<List<MenuItemResponse>> getSimplifiedMenuItems() {
+        return ResponseEntity.ok().body(menuItemService.getSimplifiedMenuItems());
+    }
+
+    @GetMapping("/staff")
+    public ResponseEntity<List<MenuItemDetailedResponse>> getDetailedMenuItems() {
+        return ResponseEntity.ok().body(menuItemService.getAllMenuItemsWithDetails());
     }
 
     @GetMapping("/{id}")

@@ -13,10 +13,11 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class MenuItemResponse {
+public class MenuItemDetailedResponse {
 
     private String id;
     private String name;
     private BigDecimal saleValue;
     private List<MaterialResponse> materialsRecipe;
+    private BigDecimal totalCost;
 }

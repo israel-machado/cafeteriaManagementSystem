@@ -1,12 +1,14 @@
 package com.project.cafeteriaManagementSystem.mapping;
 
 import com.project.cafeteriaManagementSystem.model.Material.MaterialDomain;
+import com.project.cafeteriaManagementSystem.model.MenuItem.MenuItemDetailedResponse;
 import com.project.cafeteriaManagementSystem.model.MenuItem.MenuItemDomain;
 import com.project.cafeteriaManagementSystem.model.MenuItem.MenuItemRequest;
 import com.project.cafeteriaManagementSystem.model.MenuItem.MenuItemResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.awt.*;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,6 +23,7 @@ public class MenuItemConverter {
         return MenuItemDomain.builder()
                 .name(menuItemRequest.getName())
                 .saleValue(totalCostWithProfit)
+                .profitMargin(menuItemRequest.getProfitMargin())
                 .materialsRecipe(materialDomainList)
                 .build();
     }
@@ -36,6 +39,15 @@ public class MenuItemConverter {
 
     public MenuItemResponse convertMenuItemDomainToResponse(MenuItemDomain menuItemDomain) {
         return MenuItemResponse.builder()
+                .id(menuItemDomain.getId())
+                .name(menuItemDomain.getName())
+                .saleValue(menuItemDomain.getSaleValue())
+                .materialsRecipe(materialConverter.convertMaterialDomainListToResponseList(menuItemDomain.getMaterialsRecipe()))
+                .build();
+    }
+
+    public MenuItemDetailedResponse convertMenuItemDomainToDetailed(MenuItemDomain menuItemDomain) {
+        return MenuItemDetailedResponse.builder()
                 .id(menuItemDomain.getId())
                 .name(menuItemDomain.getName())
                 .saleValue(menuItemDomain.getSaleValue())
