@@ -20,4 +20,5 @@ public class LoteResponse {
     private BigDecimal totalCost;
     private LocalDate validity;
     private MaterialDomain materialDomain;
+    private Double remainingQuantity;
 }

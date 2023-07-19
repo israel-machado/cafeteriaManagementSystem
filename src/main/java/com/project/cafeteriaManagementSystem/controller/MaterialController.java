@@ -19,12 +19,12 @@ public class MaterialController {
     private MaterialService materialService;
 
     @GetMapping
-    public ResponseEntity<List<MaterialResponse>> getAll() {
+    public ResponseEntity<List<MaterialResponse>> getAllMaterials() {
         return ResponseEntity.ok().body(materialService.getAllMaterials());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<MaterialResponse> getMaterialById(@PathVariable String id) {
+    public ResponseEntity<MaterialResponse> getMaterialById(@Valid @PathVariable String id) {
         return ResponseEntity.ok().body(materialService.getMaterialById(id));
     }
 
@@ -41,12 +41,13 @@ public class MaterialController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MaterialResponse> updateMaterial(@PathVariable String id, @RequestBody MaterialRequest materialRequest) {
+    public ResponseEntity<MaterialResponse> updateMaterial(@Valid @PathVariable String id,
+                                                           @RequestBody MaterialRequest materialRequest) {
         return ResponseEntity.ok().body(materialService.updateMaterial(id, materialRequest));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMaterial(@PathVariable String id) {
+    public ResponseEntity<Void> deleteMaterial(@Valid @PathVariable String id) {
         materialService.deleteMaterial(id);
         return ResponseEntity.noContent().build();
     }

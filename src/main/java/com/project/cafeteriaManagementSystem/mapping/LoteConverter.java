@@ -16,6 +16,7 @@ public class LoteConverter {
                 .amountToBeConsumed(loteDomain.getAmountToBeConsumed())
                 .totalCost(loteDomain.getTotalCost())
                 .validity(loteDomain.getValidity())
+                .remainingQuantity(loteDomain.getRemainingQuantity())
                 .build();
     }
 

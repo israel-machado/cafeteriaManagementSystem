@@ -25,7 +25,7 @@ public class MenuItemController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<MenuItemResponse> getMenuItemById(@PathVariable String id) {
+    public ResponseEntity<MenuItemResponse> getMenuItemById(@Valid @PathVariable String id) {
         return ResponseEntity.ok().body(menuItemService.getMenuItemById(id));
     }
 
@@ -36,13 +36,14 @@ public class MenuItemController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MenuItemResponse> updateMenuItem(@PathVariable String id, @RequestBody MenuItemRequest menuItemRequest) {
+    public ResponseEntity<MenuItemResponse> updateMenuItem(@Valid @PathVariable String id,
+                                                           @RequestBody MenuItemRequest menuItemRequest) {
         return ResponseEntity.ok().body(menuItemService.updateMenuItem(id, menuItemRequest));
     }
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMenuItem(@PathVariable String id) {
+    public ResponseEntity<Void> deleteMenuItem(@Valid @PathVariable String id) {
         menuItemService.deleteMenuItem(id);
         return ResponseEntity.noContent().build();
     }

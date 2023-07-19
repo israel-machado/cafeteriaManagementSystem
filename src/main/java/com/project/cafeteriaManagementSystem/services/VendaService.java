@@ -19,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class VendaService {
 
+    private LoteService loteService;
     private final VendaRepository vendaRepository;
     private final MaterialRepository materialRepository;
     private final VendaConverter vendaConverter;
@@ -37,6 +38,9 @@ public class VendaService {
             if (quantidadeAtual < quantidadeConsumida) {
                 throw new InsufficientMaterialStockException("Estoque insuficiente para o material: " + materialAtual.getName());
             }
+
+            // Consumir quantidade do lote atual do loop
+            loteService.consumeMaterialFromLote(materialAtual, quantidadeConsumida);
         }
 
         // Conversão da entidade para domain
@@ -67,5 +71,12 @@ public class VendaService {
             existingMaterial.setQuantity(newQuantity);
             materialRepository.save(existingMaterial);
         }
+    }
+
+    // GET ALL
+
+    public List<VendaResponse> getAllSells() {
+        List<VendaDomain> vendaDomainList = vendaRepository.findAll();
+        return vendaConverter.convertVendaDomainListToVendaResponseList(vendaDomainList);
     }
 }

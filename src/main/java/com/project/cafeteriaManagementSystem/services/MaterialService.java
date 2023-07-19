@@ -145,33 +145,28 @@ public class MaterialService {
             }
         }
 
-//        private void checkStockAvailability(MaterialRequest materialRequest) {
-//            //TODO Fazer quando tiver fazendo a parte da venda
-//            }
-//        }
+        private double getAvailableStock(String id) {
+            try (MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017")) {
+                // Criar conexão com o MongoDB
+                MongoDatabase database = mongoClient.getDatabase("cafeteria_db"); // Nome do seu banco de dados
+                MongoCollection<Document> collection = database.getCollection("materiais"); // Nome da coleção de materiais
 
-    private double getAvailableStock(String id) {
-        try (MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017")) {
-            // Criar conexão com o MongoDB
-            MongoDatabase database = mongoClient.getDatabase("cafeteria_db"); // Nome do seu banco de dados
-            MongoCollection<Document> collection = database.getCollection("materiais"); // Nome da coleção de materiais
+                // Criar filtro para buscar o documento do material pelo ID
+                Document filter = new Document("_id", new ObjectId(id));
 
-            // Criar filtro para buscar o documento do material pelo ID
-            Document filter = new Document("_id", new ObjectId(id));
+                // Executar a consulta para obter o documento do material
+                Document materialDocument = collection.find(filter).first();
 
-            // Executar a consulta para obter o documento do material
-            Document materialDocument = collection.find(filter).first();
+                if (materialDocument != null) {
+                    // Extrair a quantidade do material do documento
+                    double quantity = materialDocument.getDouble("quantity");
 
-            if (materialDocument != null) {
-                // Extrair a quantidade do material do documento
-                double quantity = materialDocument.getDouble("quantity");
-
-                // Retornar a quantidade disponível
-                return quantity;
-            } else {
-                // O material não foi encontrado
-                return 0;
+                    // Retornar a quantidade disponível
+                    return quantity;
+                } else {
+                    // O material não foi encontrado
+                    return 0;
+                }
             }
         }
-    }
 }

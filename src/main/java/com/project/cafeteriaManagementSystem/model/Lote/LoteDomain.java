@@ -26,4 +26,5 @@ public class LoteDomain {
     private LocalDate validity;
     @DBRef
     private MaterialDomain materialDomain;
+    private Double remainingQuantity;
 }

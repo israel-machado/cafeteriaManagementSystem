@@ -6,6 +6,9 @@ import com.project.cafeteriaManagementSystem.model.Venda.VendaResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Component
 @RequiredArgsConstructor
 public class VendaConverter {
@@ -28,5 +31,13 @@ public class VendaConverter {
                 .menuItemDomain(menuItemConverter.convertMenuItemResponseToDomain(vendaRequest.getMenuItem()))
                 .materialsConsumed(materialConverter.convertMaterialResponseListToDomainList(vendaRequest.getMaterialsConsumed()))
                 .build();
+    }
+
+    // LISTS
+
+    public List<VendaResponse> convertVendaDomainListToVendaResponseList(List<VendaDomain> vendaDomainList) {
+        return vendaDomainList.stream()
+                .map(this::convertVendaDomainToResponse)
+                .collect(Collectors.toList());
     }
 }
