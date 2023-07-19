@@ -36,11 +36,28 @@ public class MaterialConverter {
                 .build();
     }
 
+    public MaterialDomain convertMaterialResponseToDomain(MaterialResponse materialResponse) {
+
+        return MaterialDomain.builder()
+                .id(materialResponse.getId())
+                .name(materialResponse.getName())
+                .quantity(materialResponse.getQuantity())
+                .unitMeasure(materialResponse.getUnitMeasure())
+                .cost(materialResponse.getCost())
+                .build();
+    }
+
     // Lists
 
     public List<MaterialResponse> convertMaterialDomainListToResponseList(List<MaterialDomain> materialDomainList) {
         return materialDomainList.stream()
                 .map(this::convertMaterialDomainToResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<MaterialDomain> convertMaterialResponseListToDomainList(List<MaterialResponse> materialResponseList) {
+        return materialResponseList.stream()
+                .map(this::convertMaterialResponseToDomain)
                 .collect(Collectors.toList());
     }
 }

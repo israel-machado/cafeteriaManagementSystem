@@ -25,6 +25,15 @@ public class MenuItemConverter {
                 .build();
     }
 
+    public MenuItemDomain convertMenuItemResponseToDomain(MenuItemResponse menuItemResponse) {
+        return MenuItemDomain.builder()
+                .id(menuItemResponse.getId())
+                .name(menuItemResponse.getName())
+                .saleValue(menuItemResponse.getSaleValue())
+                .materialsRecipe(materialConverter.convertMaterialResponseListToDomainList(menuItemResponse.getMaterialsRecipe()))
+                .build();
+    }
+
     public MenuItemResponse convertMenuItemDomainToResponse(MenuItemDomain menuItemDomain) {
         return MenuItemResponse.builder()
                 .id(menuItemDomain.getId())
