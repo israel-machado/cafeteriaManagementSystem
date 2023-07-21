@@ -3,6 +3,7 @@ package com.project.cafeteriaManagementSystem.mapping;
 import com.project.cafeteriaManagementSystem.model.Material.MaterialDomain;
 import com.project.cafeteriaManagementSystem.model.Material.MaterialRequest;
 import com.project.cafeteriaManagementSystem.model.Material.MaterialResponse;
+import com.project.cafeteriaManagementSystem.model.Material.MaterialWithoutLoteRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +28,16 @@ public class MaterialConverter {
     }
 
     public MaterialDomain convertMaterialRequestToDomain(MaterialRequest materialRequest) {
+
+        return MaterialDomain.builder()
+                .name(materialRequest.getName())
+                .quantity(materialRequest.getQuantity())
+                .unitMeasure(materialRequest.getUnitMeasure())
+                .cost(materialRequest.getCost())
+                .build();
+    }
+
+    public MaterialDomain convertMaterialWOLoteRequestToDomain(MaterialWithoutLoteRequest materialRequest) {
 
         return MaterialDomain.builder()
                 .name(materialRequest.getName())

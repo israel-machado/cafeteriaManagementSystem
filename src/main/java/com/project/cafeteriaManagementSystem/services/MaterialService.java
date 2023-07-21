@@ -13,6 +13,7 @@ import com.project.cafeteriaManagementSystem.model.Lote.LoteDomain;
 import com.project.cafeteriaManagementSystem.model.Material.MaterialDomain;
 import com.project.cafeteriaManagementSystem.model.Material.MaterialRequest;
 import com.project.cafeteriaManagementSystem.model.Material.MaterialResponse;
+import com.project.cafeteriaManagementSystem.model.Material.MaterialWithoutLoteRequest;
 import com.project.cafeteriaManagementSystem.repository.MaterialRepository;
 import lombok.RequiredArgsConstructor;
 import org.bson.Document;
@@ -121,7 +122,7 @@ public class MaterialService {
             }
         }
 
-        public MaterialResponse insertMaterialWithOutLote(MaterialRequest materialRequest) {
+        public MaterialResponse insertMaterialWithOutLote(MaterialWithoutLoteRequest materialRequest) {
             try {
 
                 MaterialDomain existingMaterial = materialRepository.findByName(materialRequest.getName());
@@ -131,7 +132,7 @@ public class MaterialService {
 
                 } else {
                     // Convertendo a requisição para o domínio
-                    existingMaterial = materialConverter.convertMaterialRequestToDomain(materialRequest);
+                    existingMaterial = materialConverter.convertMaterialWOLoteRequestToDomain(materialRequest);
                 }
 
                 existingMaterial = materialRepository.save(existingMaterial);

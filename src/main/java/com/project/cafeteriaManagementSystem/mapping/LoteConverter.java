@@ -4,6 +4,7 @@ import com.project.cafeteriaManagementSystem.model.Lote.LoteDomain;
 import com.project.cafeteriaManagementSystem.model.Lote.LoteResponse;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,6 +24,10 @@ public class LoteConverter {
     //Lists
 
     public List<LoteResponse> convertLoteDomainListToResponseList(List<LoteDomain> loteDomainList) {
+        if (loteDomainList == null) {
+            return Collections.emptyList();
+        }
+
         return loteDomainList.stream()
                 .map(this::convertLoteDomainToResponse)
                 .collect(Collectors.toList());

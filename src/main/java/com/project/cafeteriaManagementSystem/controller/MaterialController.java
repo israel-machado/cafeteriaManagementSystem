@@ -2,6 +2,7 @@ package com.project.cafeteriaManagementSystem.controller;
 
 import com.project.cafeteriaManagementSystem.model.Material.MaterialRequest;
 import com.project.cafeteriaManagementSystem.model.Material.MaterialResponse;
+import com.project.cafeteriaManagementSystem.model.Material.MaterialWithoutLoteRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +36,7 @@ public class MaterialController {
     }
 
     @PostMapping("/register-db")
-    public ResponseEntity<MaterialResponse> insertMaterialWithOutLote(@Valid @RequestBody MaterialRequest materialRequest) {
+    public ResponseEntity<MaterialResponse> insertMaterialWithOutLote(@Valid @RequestBody MaterialWithoutLoteRequest materialRequest) {
         MaterialResponse materialResponse = materialService.insertMaterialWithOutLote(materialRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(materialResponse);
     }
