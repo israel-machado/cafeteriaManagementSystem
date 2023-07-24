@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 @Document(collection = "materiais")
-public class MaterialDomain implements Cloneable {
+public class MaterialDomain {
 
     @Id
     private String id;
@@ -28,11 +28,4 @@ public class MaterialDomain implements Cloneable {
     private Double minimumStockQuantity;
     @DBRef
     private List<LoteDomain> loteDomainList;
-
-
-    // Método clone sobrescrito
-    @Override
-    public MaterialDomain clone() throws CloneNotSupportedException {
-            return (MaterialDomain) super.clone();
-    }
 }

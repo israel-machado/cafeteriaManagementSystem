@@ -28,12 +28,12 @@ public class LoteService {
     private final LoteRepository loteRepository;
     private final LoteConverter loteConverter;
 
+    // Método para criar um novo lote associado a um material específico
     public LoteDomain createLote(MaterialRequest materialRequest, MaterialDomain materialDomain) {
-
-        // Calculando o custo total com base nos dados do material
+        // Calcula o custo total do lote com base nos dados fornecidos no materialRequest
         BigDecimal calculatedTotalCost = calculateTotalCost(materialRequest);
 
-        // Criando o objeto LoteDomain com as informações calculadas e o MaterialDomain associado
+        // Cria o objeto LoteDomain com as informações calculadas e o MaterialDomain associado
         LoteDomain loteDomain = LoteDomain.builder()
                 .amountToBeConsumed(materialRequest.getQuantity())
                 .totalCost(calculatedTotalCost)
@@ -41,9 +41,11 @@ public class LoteService {
                 .materialDomain(materialDomain)
                 .build();
 
+        // Salva o novo lote no banco de dados usando o repositório e o retorna
         return loteRepository.save(loteDomain);
     }
 
+    // Método auxiliar para calcular o custo total do lote com base nos dados fornecidos
     private BigDecimal calculateTotalCost(MaterialRequest materialRequest) {
         BigDecimal quantity = BigDecimal.valueOf(materialRequest.getQuantity());
         BigDecimal totalCost = quantity.multiply(materialRequest.getCost());
@@ -51,40 +53,46 @@ public class LoteService {
         return totalCost;
     }
 
+    // Método para consumir a quantidade especificada de um material a partir dos lotes associados
     public void consumeMaterialFromLote(MaterialDomain materialDomain, double consumedQuantity) {
         List<LoteDomain> loteDomainList = materialDomain.getLoteDomainList();
 
         if (loteDomainList != null && !loteDomainList.isEmpty()) {
-            // Ordenar a lista de lotes pelo critério da data de validade (do mais antigo para o recente)
+            // Ordena a lista de lotes pelo critério da data de validade (do mais antigo para o mais recente)
             loteDomainList.sort(Comparator.comparing(LoteDomain::getValidity));
 
             for (LoteDomain loteAtual : loteDomainList) {
                 double amountToBeConsumed = loteAtual.getAmountToBeConsumed();
 
                 if (amountToBeConsumed > 0 && consumedQuantity > 0) {
+                    // Calcula a quantidade de lote a ser consumida para o lote atual
                     double loteConsumedQuantity = Math.min(amountToBeConsumed, consumedQuantity);
+                    // Atualiza a quantidade restante no lote atual
                     loteAtual.setRemainingQuantity(loteAtual.getRemainingQuantity() - loteConsumedQuantity);
+                    // Atualiza a quantidade total a ser consumida
                     consumedQuantity -= loteConsumedQuantity;
                 }
             }
 
-            // Verificar se ainda há quantidade a ser consumida e, se sim, lançar exceção de estoque insuficiente
+            // Verifica se ainda há quantidade a ser consumida e, se sim, lança uma exceção de estoque insuficiente
             if (consumedQuantity > 0) {
                 throw new InsufficientMaterialStockException("Estoque insuficiente para o material: " + materialDomain.getName());
             }
 
-            // Salvar as atualizações dos lotes no DB
+            // Salva as atualizações dos lotes no banco de dados usando o repositório
             loteRepository.saveAll(loteDomainList);
         }
     }
 
-    // GET ALL
+    // Métodos para obter informações de lotes do banco de dados
+
+    // Método para obter uma lista de todos os lotes
     public List<LoteResponse> getAllLotes() {
         List<LoteDomain> loteDomainList = loteRepository.findAll();
         return loteConverter.convertLoteDomainListToResponseList(loteDomainList);
     }
 
-    // GET BY ID
+    // Método para obter um lote pelo ID
     public LoteResponse getLoteById(String id) {
         LoteDomain loteDomain = loteRepository.findById(id)
                 .orElseThrow(() -> new InvalidDataException("Lote não encontrado pelo ID: " + id));
@@ -92,26 +100,31 @@ public class LoteService {
         return loteConverter.convertLoteDomainToResponse(loteDomain);
     }
 
-    // UPDATE
+    // Método para atualizar a validade de um lote pelo ID
     public LoteResponse updateLoteValidity(String id, LoteRequest loteRequest) {
         try {
+            // Busca o lote pelo ID fornecido
             LoteDomain existingLote = loteRepository.findById(id)
                     .orElseThrow(() -> new InvalidDataException("Lote não encontrado pelo ID: " + id));
-            LocalDate newValidaty = loteRequest.getValidity();
-            existingLote.setValidity(newValidaty);
 
-           loteRepository.save(existingLote);
+            // Atualiza a validade do lote com a nova data fornecida
+            existingLote.setValidity(loteRequest.getValidity());
 
-           return loteConverter.convertLoteDomainToResponse(existingLote);
+            // Salva as atualizações do lote no banco de dados usando o repositório
+            loteRepository.save(existingLote);
+
+            // Converte o lote atualizado para uma resposta e o retorna
+            return loteConverter.convertLoteDomainToResponse(existingLote);
 
         } catch (InvalidDataException e) {
             throw new InvalidDataException("Não foi possível atualizar o lote de ID: " + id);
         }
     }
 
-    // DELETE
+    // Método para excluir um lote pelo ID
     public void deleteLote(String id) {
         try {
+            // Tenta excluir o lote pelo ID usando o repositório
             loteRepository.deleteById(id);
         } catch (EmptyResultDataAccessException e) {
             throw new InvalidMaterialDataException("Lote não encontrado através do ID: " + id);
@@ -120,18 +133,21 @@ public class LoteService {
         }
     }
 
-    // Lotes criados nos últimos 30 dias
+    // Métodos para obter informações sobre lotes criados nos últimos 30 dias
+
+    // Método para obter uma lista de lotes criados nos últimos 30 dias
     public List<LoteDomain> getLotesCreatedLast30Days() {
         LocalDate currentDate = LocalDate.now();
         LocalDate thirtyDaysAgo = currentDate.minusDays(30);
         return loteRepository.findByDateCreatedBetween(thirtyDaysAgo, currentDate);
     }
 
-    // Custo dos lotes criados nos últimos 30 dias
+    // Método para calcular o custo total dos lotes criados nos últimos 30 dias
     public BigDecimal calculateTotalCostLotesLast30Days() {
         List<LoteDomain> lotesCreatedLast30Days = getLotesCreatedLast30Days();
         BigDecimal totalCost = BigDecimal.ZERO;
 
+        // Soma o custo total de cada lote da lista
         for (LoteDomain lote : lotesCreatedLast30Days) {
             totalCost = totalCost.add(lote.getTotalCost());
         }

@@ -16,6 +16,7 @@ public class VendaConverter {
     private final MenuItemConverter menuItemConverter;
     private final MaterialConverter materialConverter;
 
+    // Método para converter um objeto VendaDomain em uma resposta de venda (VendaResponse)
     public VendaResponse convertVendaDomainToResponse(VendaDomain vendaDomain) {
         return VendaResponse.builder()
                 .id(vendaDomain.getId())
@@ -25,6 +26,7 @@ public class VendaConverter {
                 .build();
     }
 
+    // Método para converter uma requisição de venda (VendaRequest) em um objeto VendaDomain
     public VendaDomain convertVendaRequestToDomain(VendaRequest vendaRequest) {
         return VendaDomain.builder()
                 .saleValue(vendaRequest.getSaleValue())
@@ -33,8 +35,8 @@ public class VendaConverter {
                 .build();
     }
 
-    // LISTS
-
+    // Utiliza o Stream API do Java para mapear cada objeto VendaDomain para um objeto VendaResponse
+    // e coleta os resultados em uma lista usando Collectors.toList()
     public List<VendaResponse> convertVendaDomainListToVendaResponseList(List<VendaDomain> vendaDomainList) {
         return vendaDomainList.stream()
                 .map(this::convertVendaDomainToResponse)

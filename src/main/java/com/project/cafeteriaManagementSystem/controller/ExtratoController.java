@@ -20,12 +20,19 @@ public class ExtratoController {
     @Autowired
     private LoteService loteService;
 
+    // Método para tratar a solicitação HTTP GET em "/extrato"
     @GetMapping
     public ResponseEntity<ExtratoResponse> getExtratoLast30Days() {
+        // Chama o serviço para calcular o custo total dos lotes nos últimos 30 dias
         BigDecimal totalCostLotesLast30Days = loteService.calculateTotalCostLotesLast30Days();
+
+        // Chama o serviço para calcular o lucro total das vendas nos últimos 30 dias
         BigDecimal totalProfitLast30Days = vendaService.calculateProfitLast30Days();
 
+        // Cria um objeto ExtratoResponse com os valores calculados
         ExtratoResponse extratoResponse = new ExtratoResponse(totalCostLotesLast30Days, totalProfitLast30Days);
+
+        // Retorna uma resposta HTTP 200 OK com o objeto ExtratoResponse no corpo da resposta
         return ResponseEntity.ok(extratoResponse);
     }
 }

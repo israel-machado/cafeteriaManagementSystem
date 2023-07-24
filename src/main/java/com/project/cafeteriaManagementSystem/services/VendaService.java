@@ -21,79 +21,89 @@ import java.util.List;
 @RequiredArgsConstructor
 public class VendaService {
 
-    private LoteService loteService;
     private final VendaRepository vendaRepository;
     private final MaterialRepository materialRepository;
     private final VendaConverter vendaConverter;
 
-    // Método para realizar a venda
+    // Método para realizar uma venda
     public VendaResponse sell(VendaRequest vendaRequest) {
         // Verificar se o estoque de materiais é suficiente e consumir do estoque
         for (MaterialResponse materialConsumido : vendaRequest.getMaterialsConsumed()) {
             MaterialDomain materialAtual = materialRepository.findById(materialConsumido.getId())
                     .orElseThrow(() -> new InvalidDataException("Material não encontrado pelo ID: " + materialConsumido.getId()));
 
+            // Obtém as quantidades atuais do material no estoque e a quantidade a ser consumida
             double quantidadeAtual = materialAtual.getQuantity();
             double quantidadeConsumida = materialConsumido.getQuantity();
 
+            // Verifica se o estoque é suficiente para a quantidade consumida
             if (quantidadeAtual < quantidadeConsumida) {
                 throw new InsufficientMaterialStockException("Estoque insuficiente para o material: " + materialAtual.getName());
             }
 
-            // Subtrair a quantidade consumida do estoque do material
+            // Subtrai a quantidade consumida do estoque do material e salva as alterações no banco de dados
             materialAtual.setQuantity(quantidadeAtual - quantidadeConsumida);
             materialRepository.save(materialAtual);
         }
 
-        // Conversão da entidade para domain
+        // Converte a entidade VendaRequest para o domínio VendaDomain
         VendaDomain vendaDomain = vendaConverter.convertVendaRequestToDomain(vendaRequest);
 
-        // Atualizar estoque de materiais após venda
+        // Atualiza o estoque de materiais após a venda (chama o método privado updateMaterialStock)
         updateMaterialStock(vendaRequest.getMaterialsConsumed());
 
-        // Salvar a venda no banco de dados
+        // Salva a venda no banco de dados usando o repositório de vendas
         vendaRepository.save(vendaDomain);
 
-        // Retornar a resposta da venda
+        // Converte a entidade VendaDomain para a resposta VendaResponse e a retorna
         return vendaConverter.convertVendaDomainToResponse(vendaDomain);
-
     }
 
+    // Método para obter uma venda pelo ID
+    public VendaResponse getSellById(String id) {
+        VendaDomain vendaDomain = vendaRepository.findById(id)
+                .orElseThrow(() -> new InvalidDataException("Venda não encontrada pelo ID: " + id));
+
+        return vendaConverter.convertVendaDomainToResponse(vendaDomain);
+    }
+
+    // Método privado para atualizar o estoque de materiais após uma venda
     private void updateMaterialStock(List<MaterialResponse> consumedMaterials) {
         for (MaterialResponse materialConsumed : consumedMaterials) {
-
             MaterialDomain existingMaterial = materialRepository.findById(materialConsumed.getId())
                     .orElseThrow(() -> new InvalidDataException("Material não encontrado pelo ID: " + materialConsumed.getId()));
 
+            // Obtém as quantidades atuais do material no estoque e a quantidade consumida na venda
             double actualQuantity = existingMaterial.getQuantity();
             double consumedQuantity = materialConsumed.getQuantity();
 
+            // Calcula a nova quantidade após a venda e atualiza o estoque do material no banco de dados
             double newQuantity = actualQuantity - consumedQuantity;
-
             existingMaterial.setQuantity(newQuantity);
             materialRepository.save(existingMaterial);
         }
     }
 
-    // GET ALL
+    // Método para obter uma lista de todas as vendas
     public List<VendaResponse> getAllSells() {
         List<VendaDomain> vendaDomainList = vendaRepository.findAll();
         return vendaConverter.convertVendaDomainListToVendaResponseList(vendaDomainList);
     }
 
-    // Vendas nos últimos 30 dias
+    // Método para obter uma lista de vendas realizadas nos últimos 30 dias
     public List<VendaDomain> getVendasLast30Days() {
         LocalDate currentDate = LocalDate.now();
         LocalDate thirtyDaysAgo = currentDate.minusDays(30);
         return vendaRepository.findByDateBetween(thirtyDaysAgo, currentDate);
     }
 
-    // Profit nos últimos 30 dias
+    // Método para calcular o lucro total das vendas realizadas nos últimos 30 dias
     public BigDecimal calculateProfitLast30Days() {
         List<VendaDomain> vendasLast30Days = getVendasLast30Days();
         BigDecimal totalProfit = BigDecimal.ZERO;
         BigDecimal totalCost = BigDecimal.ZERO;
 
+        // Calcula o lucro total somando o lucro de cada venda nos últimos 30 dias
         for (VendaDomain venda : vendasLast30Days) {
             totalCost = calculateTotalCost(venda.getMaterialsConsumed());
             totalProfit = totalProfit.add(venda.getSaleValue().subtract(totalCost));
@@ -102,6 +112,7 @@ public class VendaService {
         return totalProfit;
     }
 
+    // Método para calcular o custo total dos materiais consumidos em uma venda
     public BigDecimal calculateTotalCost(List<MaterialDomain> materialsConsumed) {
         BigDecimal totalCost = BigDecimal.ZERO;
         for (MaterialDomain material : materialsConsumed) {
@@ -111,6 +122,6 @@ public class VendaService {
             totalCost = totalCost.add(materialTotalCost);
         }
 
-        return  totalCost;
+        return totalCost;
     }
 }
