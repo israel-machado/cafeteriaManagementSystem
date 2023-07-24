@@ -1,27 +1,24 @@
 package com.project.cafeteriaManagementSystem.services;
 
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
 import com.project.cafeteriaManagementSystem.exceptions.InsufficientMaterialStockException;
 import com.project.cafeteriaManagementSystem.exceptions.InsufficientStockException;
 import com.project.cafeteriaManagementSystem.exceptions.InvalidDataException;
 import com.project.cafeteriaManagementSystem.exceptions.InvalidMaterialDataException;
+import com.project.cafeteriaManagementSystem.mapping.LoteConverter;
 import com.project.cafeteriaManagementSystem.mapping.MaterialConverter;
 import com.project.cafeteriaManagementSystem.model.Lote.LoteDomain;
+import com.project.cafeteriaManagementSystem.model.Lote.LoteResponse;
 import com.project.cafeteriaManagementSystem.model.Material.MaterialDomain;
 import com.project.cafeteriaManagementSystem.model.Material.MaterialRequest;
 import com.project.cafeteriaManagementSystem.model.Material.MaterialResponse;
 import com.project.cafeteriaManagementSystem.model.Material.MaterialWithoutLoteRequest;
 import com.project.cafeteriaManagementSystem.repository.MaterialRepository;
 import lombok.RequiredArgsConstructor;
-import org.bson.Document;
-import org.bson.types.ObjectId;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +29,7 @@ public class MaterialService {
         private final MaterialConverter materialConverter;
         private final MaterialRepository materialRepository;
         private final LoteService loteService;
+        private final LoteConverter loteConverter;
 
         // GET ALL
         public List<MaterialResponse> getAllMaterials() {
@@ -146,28 +144,30 @@ public class MaterialService {
             }
         }
 
-        private double getAvailableStock(String id) {
-            try (MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017")) {
-                // Criar conexão com o MongoDB
-                MongoDatabase database = mongoClient.getDatabase("cafeteria_db"); // Nome do seu banco de dados
-                MongoCollection<Document> collection = database.getCollection("materiais"); // Nome da coleção de materiais
+    public List<MaterialResponse> getExpiringMaterials(int daysToExpiration) {
+        LocalDate currentDate = LocalDate.now();
+        LocalDate expirationDateThreshold = currentDate.plusDays(daysToExpiration);
 
-                // Criar filtro para buscar o documento do material pelo ID
-                Document filter = new Document("_id", new ObjectId(id));
+        List<MaterialDomain> materials = materialRepository.findAll();
+        List<MaterialResponse> expiringMaterials = new ArrayList<>();
 
-                // Executar a consulta para obter o documento do material
-                Document materialDocument = collection.find(filter).first();
-
-                if (materialDocument != null) {
-                    // Extrair a quantidade do material do documento
-                    double quantity = materialDocument.getDouble("quantity");
-
-                    // Retornar a quantidade disponível
-                    return quantity;
-                } else {
-                    // O material não foi encontrado
-                    return 0;
+        for (MaterialDomain material : materials) {
+            List<LoteDomain> lotes = material.getLoteDomainList();
+            if (lotes != null && !lotes.isEmpty()) {
+                List<LoteResponse> expiringLotes = new ArrayList<>();
+                for (LoteDomain lote : lotes) {
+                    if (lote.getValidity().isBefore(expirationDateThreshold)) {
+                        expiringLotes.add(loteConverter.convertLoteDomainToResponse(lote));
+                    }
+                }
+                if (!expiringLotes.isEmpty()) {
+                    MaterialResponse materialResponse = materialConverter.convertMaterialDomainToResponse(material);
+                    materialResponse.setLoteResponseList(expiringLotes);
+                    expiringMaterials.add(materialResponse);
                 }
             }
         }
+
+        return expiringMaterials;
+    }
 }

@@ -52,4 +52,10 @@ public class MaterialController {
         materialService.deleteMaterial(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/expiring")
+    public ResponseEntity<List<MaterialResponse>> getExpiringMaterials(@RequestParam int daysToExpiration) {
+        List<MaterialResponse> expiringMaterials = materialService.getExpiringMaterials(daysToExpiration);
+        return ResponseEntity.ok(expiringMaterials);
+    }
 }
