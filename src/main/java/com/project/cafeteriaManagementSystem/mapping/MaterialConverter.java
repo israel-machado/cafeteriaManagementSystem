@@ -1,9 +1,11 @@
 package com.project.cafeteriaManagementSystem.mapping;
 
+import com.project.cafeteriaManagementSystem.exceptions.InvalidMaterialDataException;
 import com.project.cafeteriaManagementSystem.model.Material.MaterialDomain;
 import com.project.cafeteriaManagementSystem.model.Material.MaterialRequest;
 import com.project.cafeteriaManagementSystem.model.Material.MaterialResponse;
 import com.project.cafeteriaManagementSystem.model.Material.MaterialWithoutLoteRequest;
+import com.project.cafeteriaManagementSystem.repository.MaterialRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +16,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MaterialConverter {
 
+    private final MaterialRepository materialRepository;
     private final LoteConverter loteConverter;
 
     public MaterialDomain convertMaterialRequestToDomain(MaterialRequest materialRequest) {
@@ -58,6 +61,22 @@ public class MaterialConverter {
                 .unitMeasure(materialRequest.getUnitMeasure())
                 .cost(materialRequest.getCost())
                 .build();
+    }
+
+    public MaterialDomain convertMaterialNameAndQuantityToDomain(String materialName, double quantity) {
+        MaterialDomain materialDomain = materialRepository.findByName(materialName);
+
+        if (materialDomain == null) {
+            throw new InvalidMaterialDataException("Material não encontrado: " + materialName);
+        }
+        try {
+            MaterialDomain materialWithQuantity = materialDomain.clone();
+            materialWithQuantity.setQuantity(quantity);
+            return materialWithQuantity;
+
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException("Erro ao clonar o objeto MaterialDomain: " + e.getMessage());
+        }
     }
 
     // Lists

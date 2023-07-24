@@ -23,10 +23,22 @@ public class MenuItemRequest {
     private BigDecimal saleValue;
 
     @NotEmpty(message = "A lista de materiais não pode estar vazia")
-    private List<String> materialsRecipeNames;
+    private List<MaterialInfo> materialsRecipe;
 
     @NotNull(message = "A taxa de lucro deve ser informada")
     @DecimalMin(value = "0.10", message = "A taxa de lucro mínima é de 10%")
     @DecimalMax(value = "1.00", message = "A taxa de lucro máxima é de 100%")
     private BigDecimal profitMargin;
+
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Data
+    public static class MaterialInfo {
+        @NotBlank(message = "O nome do material é obrigatório")
+        private String materialName;
+
+        @Positive(message = "A quantidade do material deve ser positiva")
+        private double quantity;
+    }
 }

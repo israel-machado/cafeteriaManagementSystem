@@ -1,5 +1,6 @@
 package com.project.cafeteriaManagementSystem.services;
 
+import com.project.cafeteriaManagementSystem.exceptions.InsufficientMaterialStockException;
 import com.project.cafeteriaManagementSystem.exceptions.InvalidDataException;
 import com.project.cafeteriaManagementSystem.exceptions.InvalidMaterialDataException;
 import com.project.cafeteriaManagementSystem.exceptions.InvalidMenuItemDataException;
@@ -46,26 +47,38 @@ public class MenuItemService {
     public MenuItemResponse createMenuItem(MenuItemRequest menuItemRequest) {
         List<MaterialDomain> materialDomainList = new ArrayList<>();
 
-        for (String materialName : menuItemRequest.getMaterialsRecipeNames()) {
+        for (MenuItemRequest.MaterialInfo materialInfo : menuItemRequest.getMaterialsRecipe()) {
+            String materialName = materialInfo.getMaterialName();
+            double quantity = materialInfo.getQuantity();
+
             MaterialDomain materialDomain = materialRepository.findByName(materialName);
-            if (materialDomain != null) {
-                materialDomainList.add(materialDomain);
-            } else {
+            if (materialDomain == null) {
                 throw new InvalidMaterialDataException("Material não encontrado: " + materialName);
             }
+
+            // Verificar se a quantidade disponível no estoque é suficiente
+            if (materialDomain.getQuantity() < quantity) {
+                throw new InsufficientMaterialStockException("Estoque insuficiente para o material: " + materialName);
+            }
+
+            // Adicionar o material com a quantidade informada à lista de materiais da receita
+            materialDomain.setQuantity(quantity);
+            materialDomainList.add(materialDomain);
         }
 
-        // Cálculo do custo total dos materiais
-        BigDecimal totalMaterialCost = BigDecimal.ZERO;
-        for (MaterialDomain material : materialDomainList) {
-            totalMaterialCost = totalMaterialCost.add(material.getCost());
-        }
+        // Calcular o custo total dos materiais
+        BigDecimal totalCost = calculateTotalCost(materialDomainList);
 
-        // Aplicar a taxa de lucro
-        BigDecimal profitMargin = menuItemRequest.getProfitMargin(); // Taxa de lucro informada na requisição
-        BigDecimal totalCostWithProfit = totalMaterialCost.multiply(BigDecimal.ONE.add(profitMargin));
+        // Calcular o preço de venda com base no custo total e na margem de lucro informada
+        BigDecimal saleValue = totalCost.divide(BigDecimal.ONE.subtract(menuItemRequest.getProfitMargin()), RoundingMode.HALF_UP);
 
-        MenuItemDomain menuItemDomain = menuItemConverter.convertMenuItemRequestToDomain(menuItemRequest, materialDomainList, totalCostWithProfit);
+        // Criar o objeto MenuItemDomain com as informações calculadas e a lista de materiais associada
+        MenuItemDomain menuItemDomain = MenuItemDomain.builder()
+                .name(menuItemRequest.getName())
+                .saleValue(saleValue)
+                .profitMargin(menuItemRequest.getProfitMargin())
+                .materialsRecipe(materialDomainList)
+                .build();
 
         menuItemRepository.save(menuItemDomain);
 
@@ -82,11 +95,15 @@ public class MenuItemService {
         // Alterando o valor
         existingMenuItem.setSaleValue(menuItemRequest.getSaleValue());
 
-        //Alterando itens da receita
+        // Alterando itens da receita
         List<MaterialDomain> materialDomainList = new ArrayList<>();
-        for (String materialName : menuItemRequest.getMaterialsRecipeNames()) {
+        for (MenuItemRequest.MaterialInfo materialInfo : menuItemRequest.getMaterialsRecipe()) {
+            String materialName = materialInfo.getMaterialName();
+            double quantity = materialInfo.getQuantity();
+
             MaterialDomain materialDomain = materialRepository.findByName(materialName);
             if (materialDomain != null) {
+                materialDomain.setQuantity(quantity);
                 materialDomainList.add(materialDomain);
             } else {
                 throw new InvalidMaterialDataException("Material não encontrado: " + materialName);
@@ -164,7 +181,7 @@ public class MenuItemService {
         return detailedResponses;
     }
 
-    private BigDecimal calculateTotalCost(List<MaterialDomain> materialsRecipe) {
+    public BigDecimal calculateTotalCost(List<MaterialDomain> materialsRecipe) {
         BigDecimal totalCost = BigDecimal.ZERO;
 
         for (MaterialDomain materialDomain : materialsRecipe) {

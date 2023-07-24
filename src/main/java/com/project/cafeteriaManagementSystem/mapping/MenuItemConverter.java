@@ -5,11 +5,14 @@ import com.project.cafeteriaManagementSystem.model.MenuItem.MenuItemDetailedResp
 import com.project.cafeteriaManagementSystem.model.MenuItem.MenuItemDomain;
 import com.project.cafeteriaManagementSystem.model.MenuItem.MenuItemRequest;
 import com.project.cafeteriaManagementSystem.model.MenuItem.MenuItemResponse;
+import com.project.cafeteriaManagementSystem.services.MenuItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.awt.*;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,14 +22,6 @@ public class MenuItemConverter {
 
     private final MaterialConverter materialConverter;
 
-    public MenuItemDomain convertMenuItemRequestToDomain(MenuItemRequest menuItemRequest, List<MaterialDomain> materialDomainList, BigDecimal totalCostWithProfit) {
-        return MenuItemDomain.builder()
-                .name(menuItemRequest.getName())
-                .saleValue(totalCostWithProfit)
-                .profitMargin(menuItemRequest.getProfitMargin())
-                .materialsRecipe(materialDomainList)
-                .build();
-    }
 
     public MenuItemDomain convertMenuItemResponseToDomain(MenuItemResponse menuItemResponse) {
         return MenuItemDomain.builder()

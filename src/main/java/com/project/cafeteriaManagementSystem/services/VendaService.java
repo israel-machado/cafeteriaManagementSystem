@@ -28,8 +28,7 @@ public class VendaService {
 
     // Método para realizar a venda
     public VendaResponse sell(VendaRequest vendaRequest) {
-
-        // Verificar se o estoque de materiais é suficiente
+        // Verificar se o estoque de materiais é suficiente e consumir do estoque
         for (MaterialResponse materialConsumido : vendaRequest.getMaterialsConsumed()) {
             MaterialDomain materialAtual = materialRepository.findById(materialConsumido.getId())
                     .orElseThrow(() -> new InvalidDataException("Material não encontrado pelo ID: " + materialConsumido.getId()));
@@ -41,8 +40,9 @@ public class VendaService {
                 throw new InsufficientMaterialStockException("Estoque insuficiente para o material: " + materialAtual.getName());
             }
 
-            // Consumir quantidade do lote atual do loop
-            loteService.consumeMaterialFromLote(materialAtual, quantidadeConsumida);
+            // Subtrair a quantidade consumida do estoque do material
+            materialAtual.setQuantity(quantidadeAtual - quantidadeConsumida);
+            materialRepository.save(materialAtual);
         }
 
         // Conversão da entidade para domain
