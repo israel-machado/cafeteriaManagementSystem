@@ -20,5 +20,6 @@ public class MaterialResponse {
     private Double quantity;
     private String unitMeasure;
     private BigDecimal cost;
+    private Double minimumStockQuantity;
     private List<LoteResponse> loteResponseList;
 }

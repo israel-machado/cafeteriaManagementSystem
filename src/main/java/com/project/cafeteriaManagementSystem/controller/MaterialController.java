@@ -1,5 +1,6 @@
 package com.project.cafeteriaManagementSystem.controller;
 
+import com.project.cafeteriaManagementSystem.model.Material.MaterialMinimumStockRequest;
 import com.project.cafeteriaManagementSystem.model.Material.MaterialRequest;
 import com.project.cafeteriaManagementSystem.model.Material.MaterialResponse;
 import com.project.cafeteriaManagementSystem.model.Material.MaterialWithoutLoteRequest;
@@ -54,8 +55,20 @@ public class MaterialController {
     }
 
     @GetMapping("/expiring")
-    public ResponseEntity<List<MaterialResponse>> getExpiringMaterials(@RequestParam int daysToExpiration) {
+    public ResponseEntity<List<MaterialResponse>> getExpiringMaterials(@Valid @RequestParam int daysToExpiration) {
         List<MaterialResponse> expiringMaterials = materialService.getExpiringMaterials(daysToExpiration);
         return ResponseEntity.ok(expiringMaterials);
+    }
+
+    @PutMapping("/minimum-stock")
+    public ResponseEntity<MaterialResponse> updateMaterialMinimumStock(@Valid @RequestBody MaterialMinimumStockRequest request) {
+        MaterialResponse response = materialService.updateMaterialMinimumStock(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/low-stock")
+    public ResponseEntity<List<MaterialResponse>> getMaterialsWithLowStock() {
+        List<MaterialResponse> materialsWithLowStock = materialService.getMaterialsWithLowStock();
+        return ResponseEntity.ok(materialsWithLowStock);
     }
 }

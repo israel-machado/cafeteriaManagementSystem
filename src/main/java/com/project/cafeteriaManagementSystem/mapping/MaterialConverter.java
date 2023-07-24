@@ -16,17 +16,6 @@ public class MaterialConverter {
 
     private final LoteConverter loteConverter;
 
-    public MaterialResponse convertMaterialDomainToResponse(MaterialDomain materialDomain) {
-        return MaterialResponse.builder()
-                .id(materialDomain.getId())
-                .name(materialDomain.getName())
-                .quantity(materialDomain.getQuantity())
-                .unitMeasure(materialDomain.getUnitMeasure())
-                .cost(materialDomain.getCost())
-                .loteResponseList(loteConverter.convertLoteDomainListToResponseList(materialDomain.getLoteDomainList()))
-                .build();
-    }
-
     public MaterialDomain convertMaterialRequestToDomain(MaterialRequest materialRequest) {
 
         return MaterialDomain.builder()
@@ -37,13 +26,15 @@ public class MaterialConverter {
                 .build();
     }
 
-    public MaterialDomain convertMaterialWOLoteRequestToDomain(MaterialWithoutLoteRequest materialRequest) {
-
-        return MaterialDomain.builder()
-                .name(materialRequest.getName())
-                .quantity(materialRequest.getQuantity())
-                .unitMeasure(materialRequest.getUnitMeasure())
-                .cost(materialRequest.getCost())
+    public MaterialResponse convertMaterialDomainToResponse(MaterialDomain materialDomain) {
+        return MaterialResponse.builder()
+                .id(materialDomain.getId())
+                .name(materialDomain.getName())
+                .quantity(materialDomain.getQuantity())
+                .unitMeasure(materialDomain.getUnitMeasure())
+                .cost(materialDomain.getCost())
+                .minimumStockQuantity(materialDomain.getMinimumStockQuantity())
+                .loteResponseList(loteConverter.convertLoteDomainListToResponseList(materialDomain.getLoteDomainList()))
                 .build();
     }
 
@@ -55,6 +46,17 @@ public class MaterialConverter {
                 .quantity(materialResponse.getQuantity())
                 .unitMeasure(materialResponse.getUnitMeasure())
                 .cost(materialResponse.getCost())
+                .minimumStockQuantity(materialResponse.getMinimumStockQuantity())
+                .build();
+    }
+
+    public MaterialDomain convertMaterialWOLoteRequestToDomain(MaterialWithoutLoteRequest materialRequest) {
+
+        return MaterialDomain.builder()
+                .name(materialRequest.getName())
+                .quantity(materialRequest.getQuantity())
+                .unitMeasure(materialRequest.getUnitMeasure())
+                .cost(materialRequest.getCost())
                 .build();
     }
 

@@ -8,10 +8,7 @@ import com.project.cafeteriaManagementSystem.mapping.LoteConverter;
 import com.project.cafeteriaManagementSystem.mapping.MaterialConverter;
 import com.project.cafeteriaManagementSystem.model.Lote.LoteDomain;
 import com.project.cafeteriaManagementSystem.model.Lote.LoteResponse;
-import com.project.cafeteriaManagementSystem.model.Material.MaterialDomain;
-import com.project.cafeteriaManagementSystem.model.Material.MaterialRequest;
-import com.project.cafeteriaManagementSystem.model.Material.MaterialResponse;
-import com.project.cafeteriaManagementSystem.model.Material.MaterialWithoutLoteRequest;
+import com.project.cafeteriaManagementSystem.model.Material.*;
 import com.project.cafeteriaManagementSystem.repository.MaterialRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -144,30 +141,54 @@ public class MaterialService {
             }
         }
 
-    public List<MaterialResponse> getExpiringMaterials(int daysToExpiration) {
-        LocalDate currentDate = LocalDate.now();
-        LocalDate expirationDateThreshold = currentDate.plusDays(daysToExpiration);
+        public List<MaterialResponse> getExpiringMaterials(int daysToExpiration) {
+            LocalDate currentDate = LocalDate.now();
+            LocalDate expirationDateThreshold = currentDate.plusDays(daysToExpiration);
 
-        List<MaterialDomain> materials = materialRepository.findAll();
-        List<MaterialResponse> expiringMaterials = new ArrayList<>();
+            List<MaterialDomain> materials = materialRepository.findAll();
+            List<MaterialResponse> expiringMaterials = new ArrayList<>();
 
-        for (MaterialDomain material : materials) {
-            List<LoteDomain> lotes = material.getLoteDomainList();
-            if (lotes != null && !lotes.isEmpty()) {
-                List<LoteResponse> expiringLotes = new ArrayList<>();
-                for (LoteDomain lote : lotes) {
-                    if (lote.getValidity().isBefore(expirationDateThreshold)) {
-                        expiringLotes.add(loteConverter.convertLoteDomainToResponse(lote));
+            for (MaterialDomain material : materials) {
+                List<LoteDomain> lotes = material.getLoteDomainList();
+                if (lotes != null && !lotes.isEmpty()) {
+                    List<LoteResponse> expiringLotes = new ArrayList<>();
+                    for (LoteDomain lote : lotes) {
+                        if (lote.getValidity().isBefore(expirationDateThreshold)) {
+                            expiringLotes.add(loteConverter.convertLoteDomainToResponse(lote));
+                        }
+                    }
+                    if (!expiringLotes.isEmpty()) {
+                        MaterialResponse materialResponse = materialConverter.convertMaterialDomainToResponse(material);
+                        materialResponse.setLoteResponseList(expiringLotes);
+                        expiringMaterials.add(materialResponse);
                     }
                 }
-                if (!expiringLotes.isEmpty()) {
-                    MaterialResponse materialResponse = materialConverter.convertMaterialDomainToResponse(material);
-                    materialResponse.setLoteResponseList(expiringLotes);
-                    expiringMaterials.add(materialResponse);
-                }
+            }
+
+            return expiringMaterials;
+        }
+
+        public MaterialResponse updateMaterialMinimumStock(MaterialMinimumStockRequest request) {
+            MaterialDomain material = materialRepository.findById(request.getMaterialId())
+                    .orElseThrow(() -> new InvalidDataException("Material não encontrado pelo ID: " + request.getMaterialId()));
+
+            material.setMinimumStockQuantity(request.getMinimumStockQuantity());
+            materialRepository.save(material);
+
+            return materialConverter.convertMaterialDomainToResponse(material);
+        }
+
+    public List<MaterialResponse> getMaterialsWithLowStock() {
+        List<MaterialDomain> materials = materialRepository.findAll();
+        List<MaterialResponse> materialsWithLowStock = new ArrayList<>();
+
+        for (MaterialDomain material : materials) {
+            if (material.getQuantity() < material.getMinimumStockQuantity()) {
+                MaterialResponse materialResponse = materialConverter.convertMaterialDomainToResponse(material);
+                materialsWithLowStock.add(materialResponse);
             }
         }
 
-        return expiringMaterials;
+        return materialsWithLowStock;
     }
 }

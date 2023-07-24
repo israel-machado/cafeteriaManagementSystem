@@ -25,6 +25,7 @@ public class MaterialDomain {
     private Double quantity;
     private String unitMeasure;
     private BigDecimal cost;
+    private Double minimumStockQuantity;
     @DBRef
     private List<LoteDomain> loteDomainList;
 }
