@@ -13,6 +13,8 @@ import com.project.cafeteriaManagementSystem.repository.VendaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -74,9 +76,41 @@ public class VendaService {
     }
 
     // GET ALL
-
     public List<VendaResponse> getAllSells() {
         List<VendaDomain> vendaDomainList = vendaRepository.findAll();
         return vendaConverter.convertVendaDomainListToVendaResponseList(vendaDomainList);
+    }
+
+    // Vendas nos últimos 30 dias
+    public List<VendaDomain> getVendasLast30Days() {
+        LocalDate currentDate = LocalDate.now();
+        LocalDate thirtyDaysAgo = currentDate.minusDays(30);
+        return vendaRepository.findByDateBetween(thirtyDaysAgo, currentDate);
+    }
+
+    // Profit nos últimos 30 dias
+    public BigDecimal calculateProfitLast30Days() {
+        List<VendaDomain> vendasLast30Days = getVendasLast30Days();
+        BigDecimal totalProfit = BigDecimal.ZERO;
+        BigDecimal totalCost = BigDecimal.ZERO;
+
+        for (VendaDomain venda : vendasLast30Days) {
+            totalCost = calculateTotalCost(venda.getMaterialsConsumed());
+            totalProfit = totalProfit.add(venda.getSaleValue().subtract(totalCost));
+        }
+
+        return totalProfit;
+    }
+
+    public BigDecimal calculateTotalCost(List<MaterialDomain> materialsConsumed) {
+        BigDecimal totalCost = BigDecimal.ZERO;
+        for (MaterialDomain material : materialsConsumed) {
+            BigDecimal materialCost = material.getCost();
+            BigDecimal quantityConsumed = BigDecimal.valueOf(material.getQuantity());
+            BigDecimal materialTotalCost = materialCost.multiply(quantityConsumed);
+            totalCost = totalCost.add(materialTotalCost);
+        }
+
+        return  totalCost;
     }
 }

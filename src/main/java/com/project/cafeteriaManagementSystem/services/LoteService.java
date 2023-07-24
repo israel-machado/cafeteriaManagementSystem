@@ -119,4 +119,23 @@ public class LoteService {
             throw new InvalidMaterialDataException("Erro ao deletar Lote com o ID: " + id + " - " + e.getMessage());
         }
     }
+
+    // Lotes criados nos últimos 30 dias
+    public List<LoteDomain> getLotesCreatedLast30Days() {
+        LocalDate currentDate = LocalDate.now();
+        LocalDate thirtyDaysAgo = currentDate.minusDays(30);
+        return loteRepository.findByDateCreatedBetween(thirtyDaysAgo, currentDate);
+    }
+
+    // Custo dos lotes criados nos últimos 30 dias
+    public BigDecimal calculateTotalCostLotesLast30Days() {
+        List<LoteDomain> lotesCreatedLast30Days = getLotesCreatedLast30Days();
+        BigDecimal totalCost = BigDecimal.ZERO;
+
+        for (LoteDomain lote : lotesCreatedLast30Days) {
+            totalCost = totalCost.add(lote.getTotalCost());
+        }
+
+        return totalCost;
+    }
 }
