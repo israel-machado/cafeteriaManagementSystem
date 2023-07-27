@@ -1,9 +1,9 @@
 package com.project.cafeteriaManagementSystem.controller;
 
-import com.project.cafeteriaManagementSystem.model.MenuItem.MenuItemDetailedResponse;
-import com.project.cafeteriaManagementSystem.model.MenuItem.MenuItemRequest;
-import com.project.cafeteriaManagementSystem.model.MenuItem.MenuItemResponse;
-import com.project.cafeteriaManagementSystem.services.MenuItemService;
+import com.project.cafeteriaManagementSystem.model.menuItem.MenuItemDetailedResponse;
+import com.project.cafeteriaManagementSystem.model.menuItem.MenuItemRequest;
+import com.project.cafeteriaManagementSystem.model.menuItem.MenuItemResponse;
+import com.project.cafeteriaManagementSystem.service.MenuItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +13,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/menu-item")
+@RequestMapping("/menu-items")
 public class MenuItemController {
 
     @Autowired
@@ -42,7 +42,7 @@ public class MenuItemController {
 
     // Método para obter um item do cardápio pelo ID
     @GetMapping("/{id}")
-    public ResponseEntity<MenuItemResponse> getMenuItemById(@Valid @PathVariable String id) {
+    public ResponseEntity<MenuItemResponse> getMenuItemById(@PathVariable String id) {
         // Chama o serviço para obter um item do cardápio pelo ID e retorna uma resposta HTTP 200 OK com o MenuItemResponse no corpo da resposta
         return ResponseEntity.ok().body(menuItemService.getMenuItemById(id));
     }
@@ -57,15 +57,15 @@ public class MenuItemController {
 
     // Método para atualizar um item do cardápio pelo ID
     @PutMapping("/{id}")
-    public ResponseEntity<MenuItemResponse> updateMenuItem(@Valid @PathVariable String id,
-                                                           @RequestBody MenuItemRequest menuItemRequest) {
+    public ResponseEntity<MenuItemResponse> updateMenuItem(@PathVariable String id,
+                                                           @Valid @RequestBody MenuItemRequest menuItemRequest) {
         // Chama o serviço para atualizar um item do cardápio pelo ID e retorna uma resposta HTTP 200 OK com o MenuItemResponse atualizado no corpo da resposta
         return ResponseEntity.ok().body(menuItemService.updateMenuItem(id, menuItemRequest));
     }
 
     // Método para excluir um item do cardápio pelo ID
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMenuItem(@Valid @PathVariable String id) {
+    public ResponseEntity<Void> deleteMenuItem(@PathVariable String id) {
         // Chama o serviço para excluir um item do cardápio pelo ID e retorna uma resposta HTTP 204 No Content, indicando que a operação foi bem-sucedida, mas não há conteúdo para retornar no corpo da resposta
         menuItemService.deleteMenuItem(id);
         return ResponseEntity.noContent().build();

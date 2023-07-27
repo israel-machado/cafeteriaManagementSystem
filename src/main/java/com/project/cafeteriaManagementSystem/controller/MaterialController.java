@@ -1,20 +1,20 @@
 package com.project.cafeteriaManagementSystem.controller;
 
-import com.project.cafeteriaManagementSystem.model.Material.MaterialMinimumStockRequest;
-import com.project.cafeteriaManagementSystem.model.Material.MaterialRequest;
-import com.project.cafeteriaManagementSystem.model.Material.MaterialResponse;
-import com.project.cafeteriaManagementSystem.model.Material.MaterialWithoutLoteRequest;
+import com.project.cafeteriaManagementSystem.model.material.MaterialMinimumStockRequest;
+import com.project.cafeteriaManagementSystem.model.material.MaterialRequest;
+import com.project.cafeteriaManagementSystem.model.material.MaterialResponse;
+import com.project.cafeteriaManagementSystem.model.material.MaterialWithoutLoteRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.project.cafeteriaManagementSystem.services.MaterialService;
+import com.project.cafeteriaManagementSystem.service.MaterialService;
 
 import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/materiais")
+@RequestMapping("/materials")
 public class MaterialController {
 
     @Autowired
@@ -29,7 +29,7 @@ public class MaterialController {
 
     // Método para obter um material pelo ID
     @GetMapping("/{id}")
-    public ResponseEntity<MaterialResponse> getMaterialById(@Valid @PathVariable String id) {
+    public ResponseEntity<MaterialResponse> getMaterialById(@PathVariable String id) {
         // Chama o serviço para obter um material pelo ID e retorna uma resposta HTTP 200 OK com o MaterialResponse no corpo
         return ResponseEntity.ok().body(materialService.getMaterialById(id));
     }
@@ -46,21 +46,21 @@ public class MaterialController {
     @PostMapping("/register-db")
     public ResponseEntity<MaterialResponse> insertMaterialWithOutLote(@Valid @RequestBody MaterialWithoutLoteRequest materialRequest) {
         // Chama o serviço para inserir um novo material sem lote associado e retorna uma resposta HTTP 201 Created com o MaterialResponse criado no corpo da resposta
-        MaterialResponse materialResponse = materialService.insertMaterialWithOutLote(materialRequest);
+        MaterialResponse materialResponse = materialService.insertMaterialWithoutLote(materialRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(materialResponse);
     }
 
     // Método para atualizar um material pelo ID
     @PutMapping("/{id}")
-    public ResponseEntity<MaterialResponse> updateMaterial(@Valid @PathVariable String id,
-                                                           @RequestBody MaterialRequest materialRequest) {
+    public ResponseEntity<MaterialResponse> updateMaterial(@PathVariable String id,
+                                                           @Valid @RequestBody MaterialRequest materialRequest) {
         // Chama o serviço para atualizar um material pelo ID e retorna uma resposta HTTP 200 OK com o MaterialResponse atualizado no corpo da resposta
         return ResponseEntity.ok().body(materialService.updateMaterial(id, materialRequest));
     }
 
     // Método para excluir um material pelo ID
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMaterial(@Valid @PathVariable String id) {
+    public ResponseEntity<Void> deleteMaterial(@PathVariable String id) {
         // Chama o serviço para excluir um material pelo ID e retorna uma resposta HTTP 204 No Content
         materialService.deleteMaterial(id);
         return ResponseEntity.noContent().build();

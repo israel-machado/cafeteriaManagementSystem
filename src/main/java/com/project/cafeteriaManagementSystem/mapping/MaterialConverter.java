@@ -1,9 +1,9 @@
 package com.project.cafeteriaManagementSystem.mapping;
 
-import com.project.cafeteriaManagementSystem.model.Material.MaterialDomain;
-import com.project.cafeteriaManagementSystem.model.Material.MaterialRequest;
-import com.project.cafeteriaManagementSystem.model.Material.MaterialResponse;
-import com.project.cafeteriaManagementSystem.model.Material.MaterialWithoutLoteRequest;
+import com.project.cafeteriaManagementSystem.model.material.MaterialDomain;
+import com.project.cafeteriaManagementSystem.model.material.MaterialRequest;
+import com.project.cafeteriaManagementSystem.model.material.MaterialResponse;
+import com.project.cafeteriaManagementSystem.model.material.MaterialWithoutLoteRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MaterialConverter {
 
-    private final LoteConverter loteConverter;
+    private final BatchConverter batchConverter;
 
     // Método para converter uma requisição de material (MaterialRequest) em um objeto MaterialDomain
     public MaterialDomain convertMaterialRequestToDomain(MaterialRequest materialRequest) {
@@ -35,7 +35,7 @@ public class MaterialConverter {
                 .unitMeasure(materialDomain.getUnitMeasure())
                 .cost(materialDomain.getCost())
                 .minimumStockQuantity(materialDomain.getMinimumStockQuantity())
-                .loteResponseList(loteConverter.convertLoteDomainListToResponseList(materialDomain.getLoteDomainList()))
+                .batchResponseList(batchConverter.convertLoteDomainListToResponseList(materialDomain.getBatchDomainList()))
                 .build();
     }
 

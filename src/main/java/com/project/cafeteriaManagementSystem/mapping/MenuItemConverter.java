@@ -1,8 +1,8 @@
 package com.project.cafeteriaManagementSystem.mapping;
 
-import com.project.cafeteriaManagementSystem.model.MenuItem.MenuItemDetailedResponse;
-import com.project.cafeteriaManagementSystem.model.MenuItem.MenuItemDomain;
-import com.project.cafeteriaManagementSystem.model.MenuItem.MenuItemResponse;
+import com.project.cafeteriaManagementSystem.model.menuItem.MenuItemDetailedResponse;
+import com.project.cafeteriaManagementSystem.model.menuItem.MenuItemDomain;
+import com.project.cafeteriaManagementSystem.model.menuItem.MenuItemResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
