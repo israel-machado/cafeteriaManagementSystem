@@ -15,11 +15,10 @@ import java.time.LocalDateTime;
 @Data
 public class BatchRequest {
 
-    private Double quantity;
+    private Double initialAmount;
     private BigDecimal cost;
     private LocalDateTime validity;
     private LocalDateTime dateOfPurchase;
     private String supplierName;
-    private Double initialAmount;
     private MaterialRequest materialRequest;
 }

@@ -18,30 +18,21 @@ public class MenuItemConverter {
     // Método para converter uma resposta de MenuItem (MenuItemResponse) em um objeto de domínio MenuItemDomain
     public MenuItemDomain convertMenuItemResponseToDomain(MenuItemResponse menuItemResponse) {
         return MenuItemDomain.builder()
-                .id(menuItemResponse.getId())
-                .name(menuItemResponse.getName())
-                .saleValue(menuItemResponse.getSaleValue())
-                .materialsRecipe(materialConverter.convertMaterialResponseListToDomainList(menuItemResponse.getMaterialsRecipe()))
+
                 .build();
     }
 
     // Método para converter um objeto de domínio MenuItemDomain em uma resposta de MenuItem (MenuItemResponse)
     public MenuItemResponse convertMenuItemDomainToResponse(MenuItemDomain menuItemDomain) {
         return MenuItemResponse.builder()
-                .id(menuItemDomain.getId())
-                .name(menuItemDomain.getName())
-                .saleValue(menuItemDomain.getSaleValue())
-                .materialsRecipe(materialConverter.convertMaterialDomainListToResponseList(menuItemDomain.getMaterialsRecipe()))
+
                 .build();
     }
 
     // Método para converter um objeto de domínio MenuItemDomain em uma resposta detalhada de MenuItem (MenuItemDetailedResponse)
     public MenuItemDetailedResponse convertMenuItemDomainToDetailed(MenuItemDomain menuItemDomain) {
         return MenuItemDetailedResponse.builder()
-                .id(menuItemDomain.getId())
-                .name(menuItemDomain.getName())
-                .saleValue(menuItemDomain.getSaleValue())
-                .materialsRecipe(materialConverter.convertMaterialDomainListToResponseList(menuItemDomain.getMaterialsRecipe()))
+
                 .build();
     }
 

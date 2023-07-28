@@ -6,7 +6,11 @@ import com.project.cafeteriaManagementSystem.mapping.BatchConverter;
 import com.project.cafeteriaManagementSystem.mapping.MaterialConverter;
 import com.project.cafeteriaManagementSystem.model.batch.BatchDomain;
 import com.project.cafeteriaManagementSystem.model.batch.BatchResponse;
-import com.project.cafeteriaManagementSystem.model.material.*;
+import com.project.cafeteriaManagementSystem.model.material.MaterialDomain;
+import com.project.cafeteriaManagementSystem.model.material.MaterialMinimumStockRequest;
+import com.project.cafeteriaManagementSystem.model.material.MaterialRequest;
+import com.project.cafeteriaManagementSystem.model.material.MaterialResponse;
+import com.project.cafeteriaManagementSystem.repository.BatchRepository;
 import com.project.cafeteriaManagementSystem.repository.MaterialRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -23,8 +27,8 @@ public class MaterialService {
     // Atributos e injeções de dependência
     private final MaterialConverter materialConverter;
     private final MaterialRepository materialRepository;
-    private final BatchService batchService;
     private final BatchConverter batchConverter;
+    private final BatchRepository batchRepository;
 
     // GET ALL
     public List<MaterialResponse> getAllMaterials() {
@@ -106,22 +110,30 @@ public class MaterialService {
         List<MaterialResponse> expiringMaterials = new ArrayList<>();
 
         for (MaterialDomain material : materials) {
-            List<BatchDomain> lotes = material.getBatchDomainList();
-            if (lotes != null && !lotes.isEmpty()) {
-                List<BatchResponse> expiringLotes = new ArrayList<>();
-                for (BatchDomain lote : lotes) {
-                    if (lote.getValidity().isBefore(expirationDateThreshold)) {
-                        // Se o lote está prestes a vencer, adiciona na lista de lotes expirando
-                        expiringLotes.add(batchConverter.convertBatchDomainToResponse(lote));
-                    }
-                }
-                if (!expiringLotes.isEmpty()) {
-                    // Se há lotes expirando, cria uma resposta para o material e adiciona na lista
-                    MaterialResponse materialResponse = materialConverter.convertMaterialDomainToResponse(material);
-                    materialResponse.setBatchResponseList(expiringLotes);
-                    expiringMaterials.add(materialResponse);
+            // Obtém a lista de lotes do material atual
+            List<BatchDomain> batchDomainList = material.getBatchDomainList();
+
+            if (batchDomainList.isEmpty() && batchDomainList == null) {
+                throw new InvalidDataException("O Material não possui lotes no momento.");
+            }
+            //Inicializa uma lista de lote do tipo Response
+            List<BatchResponse> expiringBatches = new ArrayList<>();
+
+            for (BatchDomain batch : batchDomainList) {
+                if (batch.getValidity().isBefore(expirationDateThreshold.atStartOfDay())) {
+                    // Se o batch está prestes a vencer, adiciona na lista de lotes expirando
+                    expiringBatches.add(batchConverter.convertBatchDomainToResponse(batch));
                 }
             }
+            // Se a lista expiringBatches estiver vazia retorna uma mensagem
+            if (expiringBatches.isEmpty()) {
+                throw new InvalidDataException("O material não possui nenhum lote prestes a expirar em " + daysToExpiration + " dias");
+            }
+
+            // Se há lotes expirando, cria uma resposta para o material e adiciona na lista
+            MaterialResponse materialResponse = materialConverter.convertMaterialDomainToResponse(material);
+            materialResponse.setBatchResponsesList(expiringBatches);
+            expiringMaterials.add(materialResponse);
         }
 
         return expiringMaterials;
@@ -144,16 +156,30 @@ public class MaterialService {
     // Método para obter os materiais com estoque baixo
     public List<MaterialResponse> getMaterialsWithLowStock() {
         // Obtém todos os materiais do repositório
-        List<MaterialDomain> materials = materialRepository.findAll();
+        List<MaterialDomain> materialDomainList = materialRepository.findAll();
         List<MaterialResponse> materialsWithLowStock = new ArrayList<>();
 
-        for (MaterialDomain material : materials) {
-            // Verifica se a quantidade atual do material é menor que a quantidade mínima de estoque
-            if (material.getQuantity() < material.getMinimumStockQuantity()) {
-                // Se a quantidade está baixa, cria uma resposta para o material e adiciona na lista
-                MaterialResponse materialResponse = materialConverter.convertMaterialDomainToResponse(material);
-                materialsWithLowStock.add(materialResponse);
+        for (MaterialDomain material : materialDomainList) {
+            // Obtém a lista de lotes do material atual
+            List<BatchDomain> batchDomainList = material.getBatchDomainList();
+            if (batchDomainList.isEmpty() && batchDomainList == null) {
+                throw new InvalidDataException("O Material não possui lotes no momento.");
             }
+            // Inicializa a variável do resultado da soma da quantidade restante total dos lotes
+            int totalAmount = 0;
+
+            for (BatchDomain batch : batchDomainList) {
+                // Pra cada lote da lista vai somar a quantidade restante no totalAmount
+                totalAmount += batch.getRemainingAmount();
+            }
+            // Verifica se a quantidade atual do material é menor que a quantidade mínima de estoque
+            if (material.getMinimumStockQuantity() < totalAmount) {
+                // Se a quantidade está baixa, cria uma resposta para o material e adiciona na lista
+                throw new InvalidMaterialDataException("O material " + material.getName() + " está com estoque abaixo no mínimo.");
+            }
+
+            MaterialResponse materialResponse = materialConverter.convertMaterialDomainToResponse(material);
+            materialsWithLowStock.add(materialResponse);
         }
 
         return materialsWithLowStock;

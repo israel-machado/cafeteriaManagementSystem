@@ -3,7 +3,6 @@ package com.project.cafeteriaManagementSystem.mapping;
 import com.project.cafeteriaManagementSystem.model.material.MaterialDomain;
 import com.project.cafeteriaManagementSystem.model.material.MaterialRequest;
 import com.project.cafeteriaManagementSystem.model.material.MaterialResponse;
-import com.project.cafeteriaManagementSystem.model.material.MaterialWithoutLoteRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -36,31 +35,10 @@ public class MaterialConverter {
                 .build();
     }
 
-    // Método para converter uma resposta de material (MaterialResponse) em um objeto MaterialDomain
-    public MaterialDomain convertMaterialResponseToDomain(MaterialResponse materialResponse) {
-        return MaterialDomain.builder()
-                //TODO
-                .build();
-    }
-
-    // Método para converter uma requisição de material sem lote (MaterialWithoutLoteRequest) em um objeto MaterialDomain
-    public MaterialDomain convertMaterialWOLoteRequestToDomain(MaterialWithoutLoteRequest materialRequest) {
-        return MaterialDomain.builder()
-                //TODO
-                .build();
-    }
-
     // Método para converter uma lista de objetos MaterialDomain em uma lista de objetos MaterialResponse
     public List<MaterialResponse> convertMaterialDomainListToResponseList(List<MaterialDomain> materialDomainList) {
         return materialDomainList.stream()
                 .map(this::convertMaterialDomainToResponse)
-                .collect(Collectors.toList());
-    }
-
-    // Método para converter uma lista de objetos MaterialResponse em uma lista de objetos MaterialDomain
-    public List<MaterialDomain> convertMaterialResponseListToDomainList(List<MaterialResponse> materialResponseList) {
-        return materialResponseList.stream()
-                .map(this::convertMaterialResponseToDomain)
                 .collect(Collectors.toList());
     }
 }

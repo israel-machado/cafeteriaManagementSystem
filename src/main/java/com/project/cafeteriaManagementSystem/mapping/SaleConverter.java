@@ -19,19 +19,14 @@ public class SaleConverter {
     // Método para converter um objeto VendaDomain em uma resposta de venda (VendaResponse)
     public SaleResponse convertVendaDomainToResponse(SaleDomain saleDomain) {
         return SaleResponse.builder()
-                .id(saleDomain.getId())
-                .saleValue(saleDomain.getSaleValue())
-                .menuItem(menuItemConverter.convertMenuItemDomainToResponse(saleDomain.getMenuItemDomain()))
-                .materialsConsumed(materialConverter.convertMaterialDomainListToResponseList(saleDomain.getMaterialsConsumed()))
+
                 .build();
     }
 
     // Método para converter uma requisição de venda (VendaRequest) em um objeto VendaDomain
     public SaleDomain convertVendaRequestToDomain(SaleRequest saleRequest) {
         return SaleDomain.builder()
-                .saleValue(saleRequest.getSaleValue())
-                .menuItemDomain(menuItemConverter.convertMenuItemResponseToDomain(saleRequest.getMenuItem()))
-                .materialsConsumed(materialConverter.convertMaterialResponseListToDomainList(saleRequest.getMaterialsConsumed()))
+
                 .build();
     }
 

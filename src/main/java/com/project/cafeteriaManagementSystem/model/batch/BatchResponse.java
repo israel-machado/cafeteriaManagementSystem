@@ -16,13 +16,12 @@ import java.time.LocalDateTime;
 public class BatchResponse {
 
     private String id;
-    private Double quantity;
+    private Double initialAmount;
     private BigDecimal cost;
     private BigDecimal totalCost;
     private LocalDateTime validity;
     private LocalDateTime dateOfPurchase;
     private String supplierName;
-    private Double initialAmount;
     private Double remainingAmount;
     private Double wasteAmount;
     private MaterialDomain materialDomain;
