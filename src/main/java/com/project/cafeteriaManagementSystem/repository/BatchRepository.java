@@ -10,5 +10,5 @@ import java.util.List;
 @Repository
 public interface BatchRepository extends MongoRepository<BatchDomain, String> {
 
-    List<BatchDomain> findByDateCreatedBetween(LocalDate startDate, LocalDate endDate);
+    List<BatchDomain> findByDateOfPurchaseBetween(LocalDate startDate, LocalDate endDate);
 }

@@ -181,7 +181,7 @@ public class BatchService {
     public List<BatchDomain> getBatchesCreatedLast30Days() {
         LocalDate currentDate = LocalDate.now();
         LocalDate thirtyDaysAgo = currentDate.minusDays(30);
-        return batchRepository.findByDateCreatedBetween(thirtyDaysAgo, currentDate);
+        return batchRepository.findByDateOfPurchaseBetween(thirtyDaysAgo, currentDate);
     }
 
     // Método para calcular o custo total dos lotes criados nos últimos 30 dias

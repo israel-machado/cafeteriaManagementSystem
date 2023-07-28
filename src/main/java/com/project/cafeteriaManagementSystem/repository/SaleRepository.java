@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface SaleRepository extends MongoRepository<SaleDomain, String> {
 
-    List<SaleDomain> findByDateBetween(LocalDate startDate, LocalDate endDate);
+    List<SaleDomain> findByDateOfSaleBetween(LocalDate startDate, LocalDate endDate);
 }

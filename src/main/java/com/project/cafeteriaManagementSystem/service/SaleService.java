@@ -166,7 +166,7 @@ public class SaleService {
     public List<SaleDomain> getSalesLast30Days() {
         LocalDate currentDate = LocalDate.now();
         LocalDate thirtyDaysAgo = currentDate.minusDays(30);
-        return saleRepository.findByDateBetween(thirtyDaysAgo, currentDate);
+        return saleRepository.findByDateOfSaleBetween(thirtyDaysAgo, currentDate);
     }
 
     // Método para calcular o lucro total das vendas realizadas nos últimos 30 dias
