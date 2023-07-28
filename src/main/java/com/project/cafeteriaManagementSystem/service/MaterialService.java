@@ -153,6 +153,24 @@ public class MaterialService {
         return materialConverter.convertMaterialDomainToResponse(material);
     }
 
+    // Método para atualizar o estoque de todos materiais
+    public void updateMaterialStocks() {
+        // Obtém a lista de todos materiais cadastrados
+        List<MaterialDomain> materialDomainList = materialRepository.findAll();
+
+        // Para cada material vai iterar em cada lote dele e somar o estoque
+        for (MaterialDomain material : materialDomainList) {
+            double newStock = 0.0;
+            List<BatchDomain> batchDomainList = material.getBatchDomainList();
+
+            for (BatchDomain batch : batchDomainList) {
+                newStock += batch.getRemainingAmount();
+            }
+            // Salva o estoque novo no material atual
+            material.setStock(newStock);
+        }
+    }
+
     // Método para obter os materiais com estoque baixo
     public List<MaterialResponse> getMaterialsWithLowStock() {
         // Obtém todos os materiais do repositório

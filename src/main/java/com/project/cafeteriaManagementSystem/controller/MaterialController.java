@@ -1,9 +1,11 @@
 package com.project.cafeteriaManagementSystem.controller;
 
+import com.project.cafeteriaManagementSystem.mapping.MaterialConverter;
 import com.project.cafeteriaManagementSystem.model.material.MaterialMinimumStockRequest;
 import com.project.cafeteriaManagementSystem.model.material.MaterialRequest;
 import com.project.cafeteriaManagementSystem.model.material.MaterialResponse;
 import com.project.cafeteriaManagementSystem.service.MaterialService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,11 +15,12 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/materials")
 public class MaterialController {
 
-    @Autowired
-    private MaterialService materialService;
+    private final MaterialService materialService;
+    private final MaterialConverter materialConverter;
 
     // Método para obter todos os materiais
     @GetMapping
@@ -37,7 +40,7 @@ public class MaterialController {
     @PostMapping
     public ResponseEntity<MaterialResponse> createMaterial(@Valid @RequestBody MaterialRequest materialRequest) {
         // Chama o serviço para inserir um novo material e retorna uma resposta HTTP 201 Created com o MaterialResponse criado no corpo da resposta
-        MaterialResponse materialResponse = materialService.createMaterial(materialRequest);
+        MaterialResponse materialResponse = materialConverter.convertMaterialDomainToResponse(materialService.createMaterial(materialRequest));
         return ResponseEntity.status(HttpStatus.CREATED).body(materialResponse);
     }
 
@@ -63,6 +66,13 @@ public class MaterialController {
         // Chama o serviço para obter uma lista de materiais com validade próxima ao vencimento e retorna uma resposta HTTP 200 OK com essa lista no corpo da resposta
         List<MaterialResponse> expiringMaterials = materialService.getExpiringMaterials(daysToExpiration);
         return ResponseEntity.ok(expiringMaterials);
+    }
+
+    // Método para atualizar o estoque de cada material no DB
+    @PostMapping("/update")
+    public ResponseEntity<String> updateStock() {
+        materialService.updateMaterialStocks();
+        return ResponseEntity.ok("Estoque atualizado com sucesso!");
     }
 
     // Método para atualizar o estoque mínimo de um material
