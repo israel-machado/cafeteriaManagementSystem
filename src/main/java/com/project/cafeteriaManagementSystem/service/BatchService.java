@@ -89,7 +89,7 @@ public class BatchService {
     // Método para obter uma lista de todos os lotes
     public List<BatchResponse> getAllBatches() {
         List<BatchDomain> batchDomainList = batchRepository.findAll();
-        return batchConverter.convertLoteDomainListToResponseList(batchDomainList);
+        return batchConverter.convertBatchDomainListToResponseList(batchDomainList);
     }
 
     // Método para obter um lote pelo ID
@@ -97,7 +97,7 @@ public class BatchService {
         BatchDomain batchDomain = batchRepository.findById(id)
                 .orElseThrow(() -> new InvalidDataException("Lote não encontrado pelo ID: " + id));
 
-        return batchConverter.convertLoteDomainToResponse(batchDomain);
+        return batchConverter.convertBatchDomainToResponse(batchDomain);
     }
 
     // Método para atualizar a validade de um lote pelo ID
@@ -114,7 +114,7 @@ public class BatchService {
             batchRepository.save(existingLote);
 
             // Converte o lote atualizado para uma resposta e o retorna
-            return batchConverter.convertLoteDomainToResponse(existingLote);
+            return batchConverter.convertBatchDomainToResponse(existingLote);
 
         } catch (InvalidDataException e) {
             throw new InvalidDataException("Não foi possível atualizar o lote de ID: " + id);

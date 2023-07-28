@@ -12,18 +12,24 @@ import java.util.stream.Collectors;
 public class BatchConverter {
 
     // Método para converter um objeto LoteDomain em um objeto LoteResponse
-    public BatchResponse convertLoteDomainToResponse(BatchDomain batchDomain) {
+    public BatchResponse convertBatchDomainToResponse(BatchDomain batchDomain) {
         return BatchResponse.builder()
                 .id(batchDomain.getId())
-                .amountToBeConsumed(batchDomain.getAmountToBeConsumed())
+                .quantity(batchDomain.getQuantity())
+                .cost(batchDomain.getCost())
                 .totalCost(batchDomain.getTotalCost())
                 .validity(batchDomain.getValidity())
-                .remainingQuantity(batchDomain.getRemainingQuantity())
+                .dateOfPurchase(batchDomain.getDateOfPurchase())
+                .supplierName(batchDomain.getSupplierName())
+                .initialAmount(batchDomain.getInitialAmount())
+                .remainingAmount(batchDomain.getRemainingAmount())
+                .wasteAmount(batchDomain.getWasteAmount())
+                .materialDomain(batchDomain.getMaterialDomain())
                 .build();
     }
 
     // Método para converter uma lista de objetos LoteDomain em uma lista de objetos LoteResponse
-    public List<BatchResponse> convertLoteDomainListToResponseList(List<BatchDomain> batchDomainList) {
+    public List<BatchResponse> convertBatchDomainListToResponseList(List<BatchDomain> batchDomainList) {
         // Verifica se a lista de LoteDomain é nula, se sim, retorna uma lista vazia de LoteResponse
         if (batchDomainList == null) {
             return Collections.emptyList();
@@ -32,7 +38,7 @@ public class BatchConverter {
         // Utiliza o Stream API do Java para mapear cada objeto LoteDomain para um objeto LoteResponse
         // e coleta os resultados em uma lista usando Collectors.toList()
         return batchDomainList.stream()
-                .map(this::convertLoteDomainToResponse)
+                .map(this::convertBatchDomainToResponse)
                 .collect(Collectors.toList());
     }
 }

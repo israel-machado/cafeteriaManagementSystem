@@ -1,7 +1,5 @@
 package com.project.cafeteriaManagementSystem.service;
 
-import com.project.cafeteriaManagementSystem.exception.InsufficientMaterialStockException;
-import com.project.cafeteriaManagementSystem.exception.InsufficientStockException;
 import com.project.cafeteriaManagementSystem.exception.InvalidDataException;
 import com.project.cafeteriaManagementSystem.exception.InvalidMaterialDataException;
 import com.project.cafeteriaManagementSystem.mapping.BatchConverter;
@@ -74,73 +72,28 @@ public class MaterialService {
     }
 
     // INSERT
-    public MaterialResponse insertMaterial(MaterialRequest materialRequest) {
-        try {
-            // Verifica se o material já existe no banco de dados pelo nome
-            MaterialDomain existingMaterial = materialRepository.findByName(materialRequest.getName());
+    public MaterialResponse createMaterial(MaterialRequest materialRequest) {
 
-            if (existingMaterial != null) {
-                // Se o material já existe, atualiza a quantidade no estoque
-                double currentQuantity = existingMaterial.getQuantity();
-                double newQuantity = materialRequest.getQuantity() + currentQuantity;
-                existingMaterial.setQuantity(newQuantity);
-            } else {
-                // Se o material não existe, cria um novo material
-                existingMaterial = materialConverter.convertMaterialRequestToDomain(materialRequest);
-            }
+        // Verifica se o material já existe no banco de dados pelo nome
+        MaterialDomain existingMaterial = materialRepository.findByName(materialRequest.getName());
+
+        // Inicia uma variável do tipo MaterialDomain
+        MaterialDomain materialDomain;
+
+        if (existingMaterial != null) {
+            // Se o material já existe, retorna uma mensagem de erro
+            throw new InvalidDataException("Material já existe no banco de dados.");
+
+        } else {
+            // Se o material não existe, cria um novo material
+            materialDomain = materialConverter.convertMaterialRequestToDomain(materialRequest);
 
             // Salva o material no banco de dados
-            existingMaterial = materialRepository.save(existingMaterial);
-
-            // Criação de um lote para o material
-            BatchDomain batchDomain = batchService.createBatch(materialRequest, existingMaterial);
-
-            // Associação do lote ao material
-            List<BatchDomain> batchDomainList = existingMaterial.getBatchDomainList();
-            if (batchDomainList == null) {
-                batchDomainList = new ArrayList<>();
-                existingMaterial.setBatchDomainList(batchDomainList);
-            }
-            batchDomainList.add(batchDomain);
-
-            // Atualizando o material no banco de dados com a associação ao lote
-            existingMaterial = materialRepository.save(existingMaterial);
-
-            // Convertendo o domínio para a resposta
-            return materialConverter.convertMaterialDomainToResponse(existingMaterial);
-
-        } catch (InvalidDataException e) {
-            // Se os dados forem inválidos, lance uma exceção personalizada
-            throw new InvalidMaterialDataException(e.getMessage());
-        } catch (InsufficientStockException e) {
-            // Se houver estoque insuficiente, lance uma exceção personalizada
-            throw new InsufficientMaterialStockException(e.getMessage());
+            materialDomain = materialRepository.save(materialDomain);
         }
-    }
 
-    // Método para inserir um novo material sem lote
-    public MaterialResponse insertMaterialWithoutLote(MaterialWithoutLoteRequest materialRequest) {
-        try {
-            // Verifica se o material já existe no banco de dados pelo nome
-            MaterialDomain existingMaterial = materialRepository.findByName(materialRequest.getName());
-
-            if (existingMaterial != null) {
-                // Se o material já existe, lança uma exceção informando que já existe no banco de dados
-                throw new InvalidMaterialDataException("Material já existe no banco de dados.");
-            } else {
-                // Se o material não existe, converte a requisição para o domínio e salva no banco de dados
-                existingMaterial = materialConverter.convertMaterialWOLoteRequestToDomain(materialRequest);
-            }
-
-            existingMaterial = materialRepository.save(existingMaterial);
-
-            // Convertendo o domínio para a resposta
-            return materialConverter.convertMaterialDomainToResponse(existingMaterial);
-
-        } catch (InvalidDataException e) {
-            // Se os dados forem inválidos, lance uma exceção personalizada
-            throw new InvalidMaterialDataException(e.getMessage());
-        }
+        // Convertendo o domínio para a resposta
+        return materialConverter.convertMaterialDomainToResponse(materialDomain);
     }
 
     // Método para obter os materiais que estão prestes a vencer
@@ -159,7 +112,7 @@ public class MaterialService {
                 for (BatchDomain lote : lotes) {
                     if (lote.getValidity().isBefore(expirationDateThreshold)) {
                         // Se o lote está prestes a vencer, adiciona na lista de lotes expirando
-                        expiringLotes.add(batchConverter.convertLoteDomainToResponse(lote));
+                        expiringLotes.add(batchConverter.convertBatchDomainToResponse(lote));
                     }
                 }
                 if (!expiringLotes.isEmpty()) {

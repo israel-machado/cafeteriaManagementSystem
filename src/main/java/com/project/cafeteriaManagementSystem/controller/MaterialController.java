@@ -3,12 +3,11 @@ package com.project.cafeteriaManagementSystem.controller;
 import com.project.cafeteriaManagementSystem.model.material.MaterialMinimumStockRequest;
 import com.project.cafeteriaManagementSystem.model.material.MaterialRequest;
 import com.project.cafeteriaManagementSystem.model.material.MaterialResponse;
-import com.project.cafeteriaManagementSystem.model.material.MaterialWithoutLoteRequest;
+import com.project.cafeteriaManagementSystem.service.MaterialService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.project.cafeteriaManagementSystem.service.MaterialService;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -36,17 +35,9 @@ public class MaterialController {
 
     // Método para inserir um novo material
     @PostMapping
-    public ResponseEntity<MaterialResponse> insertMaterial(@Valid @RequestBody MaterialRequest materialRequest) {
+    public ResponseEntity<MaterialResponse> createMaterial(@Valid @RequestBody MaterialRequest materialRequest) {
         // Chama o serviço para inserir um novo material e retorna uma resposta HTTP 201 Created com o MaterialResponse criado no corpo da resposta
-        MaterialResponse materialResponse = materialService.insertMaterial(materialRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(materialResponse);
-    }
-
-    // Método para inserir um novo material sem lote associado
-    @PostMapping("/register-db")
-    public ResponseEntity<MaterialResponse> insertMaterialWithOutLote(@Valid @RequestBody MaterialWithoutLoteRequest materialRequest) {
-        // Chama o serviço para inserir um novo material sem lote associado e retorna uma resposta HTTP 201 Created com o MaterialResponse criado no corpo da resposta
-        MaterialResponse materialResponse = materialService.insertMaterialWithoutLote(materialRequest);
+        MaterialResponse materialResponse = materialService.createMaterial(materialRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(materialResponse);
     }
 
