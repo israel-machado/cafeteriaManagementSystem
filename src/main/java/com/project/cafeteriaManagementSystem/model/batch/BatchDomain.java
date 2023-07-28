@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Data
 @Document(collection = "batches")
-public class BatchDomain {
+public class BatchDomain implements Comparable<BatchDomain> {
 
     @Id
     private String id;
@@ -29,4 +29,10 @@ public class BatchDomain {
     private Double remainingAmount;
     private Double wasteAmount;
     private MaterialDomain materialDomain;
+
+    // Implementação do método compareTo() para comparar por validade
+    @Override
+    public int compareTo(BatchDomain otherBatch) {
+        return this.validity.compareTo(otherBatch.validity);
+    }
 }

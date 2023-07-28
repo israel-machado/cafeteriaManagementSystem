@@ -3,7 +3,8 @@ package com.project.cafeteriaManagementSystem.controller;
 import com.project.cafeteriaManagementSystem.model.batch.BatchRequest;
 import com.project.cafeteriaManagementSystem.model.batch.BatchResponse;
 import com.project.cafeteriaManagementSystem.service.BatchService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,11 +12,11 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/batches")
 public class BatchController {
 
-    @Autowired
-    private BatchService batchService;
+    private final BatchService batchService;
 
     // Método para obter todos os lotes
     @GetMapping
@@ -29,6 +30,12 @@ public class BatchController {
     public ResponseEntity<BatchResponse> getBatchById(@PathVariable String id) {
         // Chama o serviço para obter um lote pelo ID e retorna uma resposta HTTP 200 OK com o LoteResponse no corpo
         return ResponseEntity.ok().body(batchService.getBatchById(id));
+    }
+
+    // Método para criar um lote
+    public ResponseEntity<BatchResponse> createBatch(@Valid @RequestBody BatchRequest batchRequest) {
+        BatchResponse batchResponse = batchService.createBatch(batchRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(batchResponse);
     }
 
     // Método para atualizar a validade de um lote

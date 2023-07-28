@@ -1,7 +1,6 @@
 package com.project.cafeteriaManagementSystem.mapping;
 
 import com.project.cafeteriaManagementSystem.model.sale.SaleDomain;
-import com.project.cafeteriaManagementSystem.model.sale.SaleRequest;
 import com.project.cafeteriaManagementSystem.model.sale.SaleResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -17,24 +16,17 @@ public class SaleConverter {
     private final MaterialConverter materialConverter;
 
     // Método para converter um objeto VendaDomain em uma resposta de venda (VendaResponse)
-    public SaleResponse convertVendaDomainToResponse(SaleDomain saleDomain) {
+    public SaleResponse convertSaleDomainToResponse(SaleDomain saleDomain) {
         return SaleResponse.builder()
-
-                .build();
-    }
-
-    // Método para converter uma requisição de venda (VendaRequest) em um objeto VendaDomain
-    public SaleDomain convertVendaRequestToDomain(SaleRequest saleRequest) {
-        return SaleDomain.builder()
 
                 .build();
     }
 
     // Utiliza o Stream API do Java para mapear cada objeto VendaDomain para um objeto VendaResponse
     // e coleta os resultados em uma lista usando Collectors.toList()
-    public List<SaleResponse> convertVendaDomainListToVendaResponseList(List<SaleDomain> saleDomainList) {
+    public List<SaleResponse> convertSaleDomainListToSaleResponseList(List<SaleDomain> saleDomainList) {
         return saleDomainList.stream()
-                .map(this::convertVendaDomainToResponse)
+                .map(this::convertSaleDomainToResponse)
                 .collect(Collectors.toList());
     }
 }

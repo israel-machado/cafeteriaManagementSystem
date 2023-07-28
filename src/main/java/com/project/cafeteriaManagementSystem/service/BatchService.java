@@ -2,13 +2,11 @@ package com.project.cafeteriaManagementSystem.service;
 
 import com.project.cafeteriaManagementSystem.exception.InsufficientMaterialStockException;
 import com.project.cafeteriaManagementSystem.exception.InvalidDataException;
-import com.project.cafeteriaManagementSystem.exception.InvalidMaterialDataException;
 import com.project.cafeteriaManagementSystem.mapping.BatchConverter;
 import com.project.cafeteriaManagementSystem.model.batch.BatchDomain;
 import com.project.cafeteriaManagementSystem.model.batch.BatchRequest;
 import com.project.cafeteriaManagementSystem.model.batch.BatchResponse;
 import com.project.cafeteriaManagementSystem.model.material.MaterialDomain;
-import com.project.cafeteriaManagementSystem.model.material.MaterialRequest;
 import com.project.cafeteriaManagementSystem.repository.BatchRepository;
 import com.project.cafeteriaManagementSystem.repository.MaterialRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -32,7 +31,7 @@ public class BatchService {
     private final BatchConverter batchConverter;
 
     // Método para criar um novo lote associado a um material específico
-    public BatchDomain createBatch(BatchRequest batchRequest) {
+    public BatchResponse createBatch(BatchRequest batchRequest) {
         // Procura um materialDomain através do nome da requisição
         MaterialDomain materialDomain = materialRepository.findByName(batchRequest.getMaterialRequest().getName());
         // Se o nome não retornar um objeto, é criado o material e salvo no DB
@@ -58,7 +57,10 @@ public class BatchService {
                 .build();
 
         // Salva o novo lote no banco de dados usando o repositório e o retorna
-        return batchRepository.save(batchDomain);
+        batchRepository.save(batchDomain);
+
+        // Converte para Response e retorna
+        return batchConverter.convertBatchDomainToResponse(batchDomain);
     }
 
     // Método auxiliar para calcular o custo total do lote com base nos dados fornecidos
@@ -70,34 +72,30 @@ public class BatchService {
     }
 
     // Método para consumir a quantidade especificada de um material a partir dos lotes associados
-    public void consumeMaterialFromBatch(MaterialDomain materialDomain, double consumedQuantity) {
+    public BigDecimal calculateCostForQuantityAndConsumeFromBatch(MaterialDomain materialDomain, double quantityToConsume) {
+        BigDecimal totalCost = BigDecimal.ZERO;
         List<BatchDomain> batchDomainList = materialDomain.getBatchDomainList();
+        Collections.sort(batchDomainList); // Ordena a lista de lotes por validade
 
-        if (batchDomainList != null && !batchDomainList.isEmpty()) {
-            // Ordena a lista de lotes pelo critério da data de validade (do mais antigo para o mais recente)
-            batchDomainList.sort(Comparator.comparing(BatchDomain::getValidity));
+        for (BatchDomain batch : batchDomainList) {
+            double availableQuantity = batch.getRemainingAmount();
 
-            for (BatchDomain loteAtual : batchDomainList) {
-                double amountToBeConsumed = loteAtual.getAmountToBeConsumed();
+            if (availableQuantity >= quantityToConsume) {
+                // Caso a quantidade disponível no lote seja suficiente para atender a quantidade a consumir
+                BigDecimal costForQuantity = batch.getCost().multiply(BigDecimal.valueOf(quantityToConsume));
+                totalCost = totalCost.add(costForQuantity);
+                break; // Sai do loop, pois toda a quantidade foi consumida
+            } else {
+                // Caso a quantidade disponível no lote não seja suficiente para atender a quantidade a consumir
+                BigDecimal costForAvailableQuantity = batch.getCost().multiply(BigDecimal.valueOf(availableQuantity));
+                totalCost = totalCost.add(costForAvailableQuantity);
 
-                if (amountToBeConsumed > 0 && consumedQuantity > 0) {
-                    // Calcula a quantidade de lote a ser consumida para o lote atual
-                    double loteConsumedQuantity = Math.min(amountToBeConsumed, consumedQuantity);
-                    // Atualiza a quantidade restante no lote atual
-                    loteAtual.setRemainingQuantity(loteAtual.getRemainingQuantity() - loteConsumedQuantity);
-                    // Atualiza a quantidade total a ser consumida
-                    consumedQuantity -= loteConsumedQuantity;
-                }
+                // Reduz a quantidade a ser consumida pelo que foi consumido deste lote
+                quantityToConsume -= availableQuantity;
             }
-
-            // Verifica se ainda há quantidade a ser consumida e, se sim, lança uma exceção de estoque insuficiente
-            if (consumedQuantity > 0) {
-                throw new InsufficientMaterialStockException("Estoque insuficiente para o material: " + materialDomain.getName());
-            }
-
-            // Salva as atualizações dos lotes no banco de dados usando o repositório
-            batchRepository.saveAll(batchDomainList);
         }
+
+        return totalCost;
     }
 
     // Métodos para obter informações de lotes do banco de dados
