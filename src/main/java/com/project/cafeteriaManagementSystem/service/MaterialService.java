@@ -76,7 +76,7 @@ public class MaterialService {
     }
 
     // INSERT
-    public MaterialResponse createMaterial(MaterialRequest materialRequest) {
+    public MaterialDomain createMaterial(MaterialRequest materialRequest) {
 
         // Verifica se o material já existe no banco de dados pelo nome
         MaterialDomain existingMaterial = materialRepository.findByName(materialRequest.getName());
@@ -97,7 +97,7 @@ public class MaterialService {
         }
 
         // Convertendo o domínio para a resposta
-        return materialConverter.convertMaterialDomainToResponse(materialDomain);
+        return materialDomain;
     }
 
     // Método para obter os materiais que estão prestes a vencer

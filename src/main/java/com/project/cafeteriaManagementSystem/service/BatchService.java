@@ -10,6 +10,7 @@ import com.project.cafeteriaManagementSystem.model.batch.BatchResponse;
 import com.project.cafeteriaManagementSystem.model.material.MaterialDomain;
 import com.project.cafeteriaManagementSystem.model.material.MaterialRequest;
 import com.project.cafeteriaManagementSystem.repository.BatchRepository;
+import com.project.cafeteriaManagementSystem.repository.MaterialRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -25,19 +26,34 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BatchService {
 
+    private final MaterialRepository materialRepository;
+    private final MaterialService materialService;
     private final BatchRepository batchRepository;
     private final BatchConverter batchConverter;
 
     // Método para criar um novo lote associado a um material específico
-    public BatchDomain createBatch(MaterialRequest materialRequest, MaterialDomain materialDomain) {
-        // Calcula o custo total do lote com base nos dados fornecidos no materialRequest
-        BigDecimal calculatedTotalCost = calculateTotalCost(materialRequest);
+    public BatchDomain createBatch(BatchRequest batchRequest) {
+        // Procura um materialDomain através do nome da requisição
+        MaterialDomain materialDomain = materialRepository.findByName(batchRequest.getMaterialRequest().getName());
+        // Se o nome não retornar um objeto, é criado o material e salvo no DB
+        if (materialDomain == null) {
+            materialDomain = materialService.createMaterial(batchRequest.getMaterialRequest());
+            materialRepository.save(materialDomain);
+        }
 
-        // Cria o objeto LoteDomain com as informações calculadas e o MaterialDomain associado
+        // Calcula o custo total do lote com base nos dados fornecidos no materialRequest
+        BigDecimal calculatedTotalCost = calculateTotalCost(batchRequest);
+
+        // Cria o objeto BatchDomain com as informações calculadas e o MaterialDomain associado
         BatchDomain batchDomain = BatchDomain.builder()
-                .amountToBeConsumed(materialRequest.getQuantity())
+                .initialAmount(batchRequest.getInitialAmount())
+                .cost(batchRequest.getCost())
                 .totalCost(calculatedTotalCost)
-                .validity(materialRequest.getBatchRequest().getValidity())
+                .validity(batchRequest.getValidity())
+                .dateOfPurchase(batchRequest.getDateOfPurchase())
+                .supplierName(batchRequest.getSupplierName())
+                .remainingAmount(batchRequest.getInitialAmount())
+                .wasteAmount(0.0)
                 .materialDomain(materialDomain)
                 .build();
 
@@ -46,9 +62,9 @@ public class BatchService {
     }
 
     // Método auxiliar para calcular o custo total do lote com base nos dados fornecidos
-    private BigDecimal calculateTotalCost(MaterialRequest materialRequest) {
-        BigDecimal quantity = BigDecimal.valueOf(materialRequest.getQuantity());
-        BigDecimal totalCost = quantity.multiply(materialRequest.getCost());
+    private BigDecimal calculateTotalCost(BatchRequest batchRequest) {
+        BigDecimal quantity = BigDecimal.valueOf(batchRequest.getInitialAmount());
+        BigDecimal totalCost = quantity.multiply(batchRequest.getCost());
         totalCost = totalCost.setScale(2, RoundingMode.HALF_UP);
         return totalCost;
     }
@@ -85,6 +101,7 @@ public class BatchService {
     }
 
     // Métodos para obter informações de lotes do banco de dados
+    // ---------------------------------------------------------
 
     // Método para obter uma lista de todos os lotes
     public List<BatchResponse> getAllBatches() {
@@ -100,15 +117,19 @@ public class BatchService {
         return batchConverter.convertBatchDomainToResponse(batchDomain);
     }
 
-    // Método para atualizar a validade de um lote pelo ID
-    public BatchResponse updateBatchValidity(String id, BatchRequest batchRequest) {
+    // Método para atualizar um lote pelo ID
+    public BatchResponse updateBatch(String id, BatchRequest batchRequest) {
         try {
             // Busca o lote pelo ID fornecido
             BatchDomain existingLote = batchRepository.findById(id)
                     .orElseThrow(() -> new InvalidDataException("Lote não encontrado pelo ID: " + id));
 
-            // Atualiza a validade do lote com a nova data fornecida
+            // Atualiza o lote com as informações fornecidas
+            existingLote.setInitialAmount(batchRequest.getInitialAmount());
+            existingLote.setCost(batchRequest.getCost());
             existingLote.setValidity(batchRequest.getValidity());
+            existingLote.setDateOfPurchase(batchRequest.getDateOfPurchase());
+            existingLote.setSupplierName(batchRequest.getSupplierName());
 
             // Salva as atualizações do lote no banco de dados usando o repositório
             batchRepository.save(existingLote);
@@ -127,13 +148,14 @@ public class BatchService {
             // Tenta excluir o lote pelo ID usando o repositório
             batchRepository.deleteById(id);
         } catch (EmptyResultDataAccessException e) {
-            throw new InvalidMaterialDataException("Lote não encontrado através do ID: " + id);
+            throw new InvalidDataException("Lote não encontrado através do ID: " + id);
         } catch (DataIntegrityViolationException e) {
-            throw new InvalidMaterialDataException("Erro ao deletar Lote com o ID: " + id + " - " + e.getMessage());
+            throw new InvalidDataException("Erro ao deletar Lote com o ID: " + id + " - " + e.getMessage());
         }
     }
 
     // Métodos para obter informações sobre lotes criados nos últimos 30 dias
+    // ----------------------------------------------------------------------
 
     // Método para obter uma lista de lotes criados nos últimos 30 dias
     public List<BatchDomain> getBatchesCreatedLast30Days() {

@@ -36,7 +36,7 @@ public class BatchController {
     public ResponseEntity<BatchResponse> updateBatch(@PathVariable String id,
                                                      @Valid @RequestBody BatchRequest batchRequest) {
         // Chama o serviço para atualizar a validade de um lote pelo ID e retorna uma resposta HTTP 200 OK com o LoteResponse atualizado no corpo
-        return ResponseEntity.ok().body(batchService.updateBatchValidity(id, batchRequest));
+        return ResponseEntity.ok().body(batchService.updateBatch(id, batchRequest));
     }
 
     // Método para excluir um lote pelo ID
