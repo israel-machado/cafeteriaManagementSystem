@@ -177,21 +177,21 @@ public class BatchService {
     // Métodos para obter informações sobre lotes criados nos últimos 30 dias
     // ----------------------------------------------------------------------
 
-    // Método para obter uma lista de lotes criados nos últimos 30 dias
-    public List<BatchDomain> getBatchesCreatedLast30Days() {
+    // Método para obter uma lista de lotes criados em um determinado período de dias
+    public List<BatchDomain> getBatchesCreatedForTimePeriod(int duration) {
         LocalDate currentDate = LocalDate.now();
-        LocalDate thirtyDaysAgo = currentDate.minusDays(30);
-        return batchRepository.findByDateOfPurchaseBetween(thirtyDaysAgo, currentDate);
+        LocalDate startDate = currentDate.minusDays(duration);
+        return batchRepository.findByDateOfPurchaseBetween(startDate, currentDate);
     }
 
-    // Método para calcular o custo total dos lotes criados nos últimos 30 dias
-    public BigDecimal calculateTotalCostBatchesLast30Days() {
-        List<BatchDomain> lotesCreatedLast30Days = getBatchesCreatedLast30Days();
+    // Método para calcular o custo total dos lotes criados em um determinado período de dias
+    public BigDecimal calculateTotalCostBatchesForTimePeriod(int duration) {
+        List<BatchDomain> batchesCreatedForTimePeriod = getBatchesCreatedForTimePeriod(duration);
         BigDecimal totalCost = BigDecimal.ZERO;
 
         // Soma o custo total de cada lote da lista
-        for (BatchDomain lote : lotesCreatedLast30Days) {
-            totalCost = totalCost.add(lote.getTotalCost());
+        for (BatchDomain batch : batchesCreatedForTimePeriod) {
+            totalCost = totalCost.add(batch.getTotalCost());
         }
 
         return totalCost;

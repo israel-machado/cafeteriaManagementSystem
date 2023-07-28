@@ -13,13 +13,13 @@ public class ExtractService {
     private final BatchService batchService;
     private final SaleService saleService;
 
-    public ExtractResponse getCostAndProfitLast30Days() {
-        // Chama o serviço para calcular o custo total dos lotes nos últimos 30 dias
-        BigDecimal totalCostLotesLast30Days = batchService.calculateTotalCostBatchesLast30Days();
+    public ExtractResponse getCostAndProfitForTimePeriod(int duration) {
+        // Chama o serviço para calcular o custo total dos lotes no período especificado
+        BigDecimal totalCostBatches = batchService.calculateTotalCostBatchesForTimePeriod(duration);
 
-        // Chama o serviço para calcular o lucro total das vendas nos últimos 30 dias
-        BigDecimal totalProfitLast30Days = saleService.getProfitLast30Days();
+        // Chama o serviço para calcular o lucro total das vendas no período especificado
+        BigDecimal totalProfit = saleService.getProfitForTimePeriod(duration);
 
-        return new ExtractResponse(totalCostLotesLast30Days, totalProfitLast30Days);
+        return new ExtractResponse(totalCostBatches, totalProfit);
     }
 }

@@ -162,20 +162,20 @@ public class SaleService {
         return saleItemList;
     }
 
-    // Método para obter uma lista de vendas realizadas nos últimos 30 dias
-    public List<SaleDomain> getSalesLast30Days() {
+    // Método para obter uma lista de vendas realizadas em um determinado período de dias
+    public List<SaleDomain> getSalesForTimePeriod(int duration) {
         LocalDate currentDate = LocalDate.now();
-        LocalDate thirtyDaysAgo = currentDate.minusDays(30);
-        return saleRepository.findByDateOfSaleBetween(thirtyDaysAgo, currentDate);
+        LocalDate startDate = currentDate.minusDays(duration);
+        return saleRepository.findByDateOfSaleBetween(startDate, currentDate);
     }
 
-    // Método para calcular o lucro total das vendas realizadas nos últimos 30 dias
-    public BigDecimal getProfitLast30Days() {
-        List<SaleDomain> SalesLast30Days = getSalesLast30Days();
+    // Método para calcular o lucro total das vendas realizadas em um determinado período de dias
+    public BigDecimal getProfitForTimePeriod(int duration) {
+        List<SaleDomain> salesForTimePeriod = getSalesForTimePeriod(duration);
         BigDecimal totalProfit = BigDecimal.ZERO;
 
-        // Calcula o lucro total somando o lucro de cada venda nos últimos 30 dias
-        for (SaleDomain sale : SalesLast30Days) {
+        // Calcula o lucro total somando o lucro de cada venda no período especificado
+        for (SaleDomain sale : salesForTimePeriod) {
             totalProfit = totalProfit.add(sale.getProfitValue());
         }
 
