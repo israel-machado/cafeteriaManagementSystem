@@ -18,7 +18,7 @@ public class ExtractService {
         BigDecimal totalCostLotesLast30Days = batchService.calculateTotalCostBatchesLast30Days();
 
         // Chama o serviço para calcular o lucro total das vendas nos últimos 30 dias
-        BigDecimal totalProfitLast30Days = saleService.calculateProfitLast30Days();
+        BigDecimal totalProfitLast30Days = saleService.getProfitLast30Days();
 
         return new ExtractResponse(totalCostLotesLast30Days, totalProfitLast30Days);
     }

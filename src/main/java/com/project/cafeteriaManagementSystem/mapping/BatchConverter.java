@@ -15,7 +15,7 @@ public class BatchConverter {
     public BatchResponse convertBatchDomainToResponse(BatchDomain batchDomain) {
         return BatchResponse.builder()
                 .id(batchDomain.getId())
-                .quantity(batchDomain.getQuantity())
+                .initialAmount(batchDomain.getInitialAmount())
                 .cost(batchDomain.getCost())
                 .totalCost(batchDomain.getTotalCost())
                 .validity(batchDomain.getValidity())

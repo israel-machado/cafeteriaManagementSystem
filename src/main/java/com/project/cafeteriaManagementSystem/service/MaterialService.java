@@ -10,7 +10,6 @@ import com.project.cafeteriaManagementSystem.model.material.MaterialDomain;
 import com.project.cafeteriaManagementSystem.model.material.MaterialMinimumStockRequest;
 import com.project.cafeteriaManagementSystem.model.material.MaterialRequest;
 import com.project.cafeteriaManagementSystem.model.material.MaterialResponse;
-import com.project.cafeteriaManagementSystem.repository.BatchRepository;
 import com.project.cafeteriaManagementSystem.repository.MaterialRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -28,7 +27,6 @@ public class MaterialService {
     private final MaterialConverter materialConverter;
     private final MaterialRepository materialRepository;
     private final BatchConverter batchConverter;
-    private final BatchRepository batchRepository;
 
     // GET ALL
     public List<MaterialResponse> getAllMaterials() {
@@ -113,7 +111,7 @@ public class MaterialService {
             // Obtém a lista de lotes do material atual
             List<BatchDomain> batchDomainList = material.getBatchDomainList();
 
-            if (batchDomainList.isEmpty() && batchDomainList == null) {
+            if (batchDomainList.isEmpty()) {
                 throw new InvalidDataException("O Material não possui lotes no momento.");
             }
             //Inicializa uma lista de lote do tipo Response
@@ -180,7 +178,7 @@ public class MaterialService {
         for (MaterialDomain material : materialDomainList) {
             // Obtém a lista de lotes do material atual
             List<BatchDomain> batchDomainList = material.getBatchDomainList();
-            if (batchDomainList.isEmpty() && batchDomainList == null) {
+            if (batchDomainList.isEmpty()) {
                 throw new InvalidDataException("O Material não possui lotes no momento.");
             }
             // Inicializa a variável do resultado da soma da quantidade restante total dos lotes

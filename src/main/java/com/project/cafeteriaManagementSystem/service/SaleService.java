@@ -170,15 +170,13 @@ public class SaleService {
     }
 
     // Método para calcular o lucro total das vendas realizadas nos últimos 30 dias
-    public BigDecimal calculateProfitLast30Days() {
-        List<SaleDomain> vendasLast30Days = getSalesLast30Days();
+    public BigDecimal getProfitLast30Days() {
+        List<SaleDomain> SalesLast30Days = getSalesLast30Days();
         BigDecimal totalProfit = BigDecimal.ZERO;
-        BigDecimal totalCost = BigDecimal.ZERO;
 
         // Calcula o lucro total somando o lucro de cada venda nos últimos 30 dias
-        for (SaleDomain venda : vendasLast30Days) {
-            totalCost = calculateSaleTotalCost();
-            totalProfit = totalProfit.add();
+        for (SaleDomain sale : SalesLast30Days) {
+            totalProfit = totalProfit.add(sale.getProfitValue());
         }
 
         return totalProfit;

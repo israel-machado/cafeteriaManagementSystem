@@ -3,7 +3,7 @@ package com.project.cafeteriaManagementSystem.controller;
 import com.project.cafeteriaManagementSystem.model.sale.SaleRequest;
 import com.project.cafeteriaManagementSystem.model.sale.SaleResponse;
 import com.project.cafeteriaManagementSystem.service.SaleService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,11 +12,11 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/sales")
 public class SaleController {
 
-    @Autowired
-    private SaleService saleService;
+    private final SaleService saleService;
 
     // Método para obter todas as vendas
     @GetMapping

@@ -4,7 +4,7 @@ import com.project.cafeteriaManagementSystem.model.menuItem.MenuItemDetailedResp
 import com.project.cafeteriaManagementSystem.model.menuItem.MenuItemRequest;
 import com.project.cafeteriaManagementSystem.model.menuItem.MenuItemResponse;
 import com.project.cafeteriaManagementSystem.service.MenuItemService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,11 +13,11 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/menu-items")
 public class MenuItemController {
 
-    @Autowired
-    private MenuItemService menuItemService;
+    private final MenuItemService menuItemService;
 
     // Método para obter todos os itens do cardápio
     @GetMapping

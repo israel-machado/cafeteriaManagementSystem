@@ -33,6 +33,7 @@ public class BatchController {
     }
 
     // Método para criar um lote
+    @PostMapping
     public ResponseEntity<BatchResponse> createBatch(@Valid @RequestBody BatchRequest batchRequest) {
         BatchResponse batchResponse = batchService.createBatch(batchRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(batchResponse);
