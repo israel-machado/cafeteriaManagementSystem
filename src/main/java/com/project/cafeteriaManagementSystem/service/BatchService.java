@@ -96,6 +96,30 @@ public class BatchService {
         return totalCost;
     }
 
+    // Método para calcular o custo da quantidade especificada de um material a partir dos lotes associados
+    public BigDecimal calculateCostForQuantityFromBatch(MaterialDomain materialDomain, double quantityToConsume) {
+        BigDecimal totalCost = BigDecimal.ZERO;
+        List<BatchDomain> batchDomainList = materialDomain.getBatchDomainList();
+        Collections.sort(batchDomainList); // Ordena a lista de lotes por validade
+
+        for (BatchDomain batch : batchDomainList) {
+            double availableQuantity = batch.getRemainingAmount();
+
+            if (availableQuantity >= quantityToConsume) {
+                // Caso a quantidade disponível no lote seja suficiente para atender a quantidade a consumir
+                BigDecimal costForQuantity = batch.getCost().multiply(BigDecimal.valueOf(quantityToConsume));
+                totalCost = totalCost.add(costForQuantity);
+                break; // Sai do loop, pois toda a quantidade foi consumida
+            } else {
+                // Caso a quantidade disponível no lote não seja suficiente para atender a quantidade a consumir
+                BigDecimal costForAvailableQuantity = batch.getCost().multiply(BigDecimal.valueOf(availableQuantity));
+                totalCost = totalCost.add(costForAvailableQuantity);
+            }
+        }
+
+        return totalCost;
+    }
+
     // Métodos para obter informações de lotes do banco de dados
     // ---------------------------------------------------------
 

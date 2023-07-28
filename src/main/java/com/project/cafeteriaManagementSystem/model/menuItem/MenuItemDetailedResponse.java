@@ -1,6 +1,6 @@
 package com.project.cafeteriaManagementSystem.model.menuItem;
 
-import com.project.cafeteriaManagementSystem.model.material.MaterialResponse;
+import com.project.cafeteriaManagementSystem.model.material.MaterialInfo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,7 +17,7 @@ public class MenuItemDetailedResponse {
 
     private String id;
     private String name;
-    private BigDecimal saleValue;
-    private List<MaterialResponse> materialsRecipe;
+    private BigDecimal salePrice;
+    private List<MaterialInfo> materialsRecipe;
     private BigDecimal totalCost;
 }

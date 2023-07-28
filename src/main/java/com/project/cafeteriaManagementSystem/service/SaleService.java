@@ -129,7 +129,7 @@ public class SaleService {
                 totalCost = totalCost.add(costForQuantity);
             }
         }
-        return totalCost;
+        return totalCost.setScale(2, RoundingMode.HALF_UP);
     }
 
     // Método para calcular o valor do lucro

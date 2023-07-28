@@ -6,6 +6,7 @@ import com.project.cafeteriaManagementSystem.model.menuItem.MenuItemResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,26 +14,24 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MenuItemConverter {
 
-    private final MaterialConverter materialConverter;
-
-    // Método para converter uma resposta de MenuItem (MenuItemResponse) em um objeto de domínio MenuItemDomain
-    public MenuItemDomain convertMenuItemResponseToDomain(MenuItemResponse menuItemResponse) {
-        return MenuItemDomain.builder()
-
-                .build();
-    }
-
     // Método para converter um objeto de domínio MenuItemDomain em uma resposta de MenuItem (MenuItemResponse)
     public MenuItemResponse convertMenuItemDomainToResponse(MenuItemDomain menuItemDomain) {
         return MenuItemResponse.builder()
-
+                .id(menuItemDomain.getId())
+                .name(menuItemDomain.getName())
+                .salePrice(menuItemDomain.getSalePrice())
+                .materialsRecipe(menuItemDomain.getMaterialsRecipe())
                 .build();
     }
 
     // Método para converter um objeto de domínio MenuItemDomain em uma resposta detalhada de MenuItem (MenuItemDetailedResponse)
-    public MenuItemDetailedResponse convertMenuItemDomainToDetailed(MenuItemDomain menuItemDomain) {
+    public MenuItemDetailedResponse convertMenuItemDomainToDetailed(MenuItemDomain menuItemDomain, BigDecimal totalCost) {
         return MenuItemDetailedResponse.builder()
-
+                .id(menuItemDomain.getId())
+                .name(menuItemDomain.getName())
+                .salePrice(menuItemDomain.getSalePrice())
+                .materialsRecipe(menuItemDomain.getMaterialsRecipe())
+                .totalCost(totalCost)
                 .build();
     }
 

@@ -49,7 +49,7 @@ public class MenuItemController {
 
     // Método para inserir um novo item no cardápio
     @PostMapping
-    public ResponseEntity<MenuItemResponse> insertMenuItem(@Valid @RequestBody MenuItemRequest menuItemRequest) {
+    public ResponseEntity<MenuItemResponse> createMenuItem(@Valid @RequestBody MenuItemRequest menuItemRequest) {
         // Chama o serviço para inserir um novo item no cardápio e retorna uma resposta HTTP 201 Created com o MenuItemResponse criado no corpo da resposta
         MenuItemResponse menuItemResponse = menuItemService.createMenuItem(menuItemRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(menuItemResponse);
