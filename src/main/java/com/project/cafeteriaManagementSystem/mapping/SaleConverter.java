@@ -12,13 +12,16 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SaleConverter {
 
-    private final MenuItemConverter menuItemConverter;
-    private final MaterialConverter materialConverter;
-
     // Método para converter um objeto VendaDomain em uma resposta de venda (VendaResponse)
     public SaleResponse convertSaleDomainToResponse(SaleDomain saleDomain) {
         return SaleResponse.builder()
-
+                .id(saleDomain.getId())
+                .dateOfSale(saleDomain.getDateOfSale())
+                .salePrice(saleDomain.getSalePrice())
+                .saleCost(saleDomain.getSaleCost())
+                .profitValue(saleDomain.getProfitValue())
+                .profitMargin(saleDomain.getProfitMargin())
+                .saleItems(saleDomain.getSaleItems())
                 .build();
     }
 
