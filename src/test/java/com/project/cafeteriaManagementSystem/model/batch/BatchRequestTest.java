@@ -1,6 +1,6 @@
 package com.project.cafeteriaManagementSystem.model.batch;
 
-import com.project.cafeteriaManagementSystem.model.material.MaterialRequest;
+import com.project.cafeteriaManagementSystem.model.material.MaterialRequestTest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,12 +13,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class BatchRequest {
+public class BatchRequestTest {
 
     private Double initialAmount;
     private BigDecimal totalCost;
     private LocalDateTime validity;
     private LocalDateTime dateOfPurchase;
     private String supplierName;
-    private MaterialRequest materialRequest;
+    private MaterialRequestTest materialRequestTest;
 }

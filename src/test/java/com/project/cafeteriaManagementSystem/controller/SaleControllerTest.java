@@ -1,8 +1,8 @@
 package com.project.cafeteriaManagementSystem.controller;
 
-import com.project.cafeteriaManagementSystem.model.sale.SaleRequest;
-import com.project.cafeteriaManagementSystem.model.sale.SaleResponse;
-import com.project.cafeteriaManagementSystem.service.SaleService;
+import com.project.cafeteriaManagementSystem.model.sale.SaleRequestTest;
+import com.project.cafeteriaManagementSystem.model.sale.SaleResponseTest;
+import com.project.cafeteriaManagementSystem.service.SaleServiceTest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,46 +14,46 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/sale")
-public class SaleController {
+public class SaleControllerTest {
 
-    private final SaleService saleService;
+    private final SaleServiceTest saleServiceTest;
 
     // Método para obter todas as vendas
     @GetMapping
-    public ResponseEntity<List<SaleResponse>> getAllSales() {
+    public ResponseEntity<List<SaleResponseTest>> getAllSales() {
         // Chama o serviço para obter todas as vendas e retorna uma resposta HTTP 200 OK com a lista de VendaResponse no corpo da resposta
-        return ResponseEntity.ok().body(saleService.getAllSales());
+        return ResponseEntity.ok().body(saleServiceTest.getAllSales());
     }
 
     // Método para obter todas as vendas em um determinado período de dias
     @GetMapping("/by-date")
-    public ResponseEntity<List<SaleResponse>> getSalesByDate(@RequestParam int duration) {
-        List<SaleResponse> sales = saleService.getSalesByDuration(duration);
+    public ResponseEntity<List<SaleResponseTest>> getSalesByDate(@RequestParam int duration) {
+        List<SaleResponseTest> sales = saleServiceTest.getSalesByDuration(duration);
         return ResponseEntity.ok(sales);
     }
 
     // Método para obter todas as vendas em um determinado mês
     @GetMapping("/by-month")
-    public ResponseEntity<List<SaleResponse>> getSalesByMonth(@RequestParam int month, @RequestParam int year) {
-        List<SaleResponse> sales = saleService.getSalesForMonth(month, year);
+    public ResponseEntity<List<SaleResponseTest>> getSalesByMonth(@RequestParam int month, @RequestParam int year) {
+        List<SaleResponseTest> sales = saleServiceTest.getSalesForMonth(month, year);
         return ResponseEntity.ok(sales);
     }
 
     // Método para obter uma venda pelo ID
     @GetMapping("/{id}")
-    public ResponseEntity<SaleResponse> getSaleById(@PathVariable String id) {
+    public ResponseEntity<SaleResponseTest> getSaleById(@PathVariable String id) {
         // Chama o serviço para obter os detalhes da venda com o ID fornecido na requisição
-        SaleResponse saleResponse = saleService.getSaleById(id);
+        SaleResponseTest saleResponseTest = saleServiceTest.getSaleById(id);
         // Retorna uma resposta HTTP 200 OK com o VendaResponse contendo os detalhes da venda no corpo da resposta
-        return ResponseEntity.ok(saleResponse);
+        return ResponseEntity.ok(saleResponseTest);
     }
 
     // Método para realizar uma venda
     @PostMapping
-    public ResponseEntity<SaleResponse> makeSale(@Valid @RequestBody SaleRequest saleRequest) {
+    public ResponseEntity<SaleResponseTest> makeSale(@Valid @RequestBody SaleRequestTest saleRequestTest) {
         // Chama o serviço para realizar a venda com os dados fornecidos na requisição
         // e retorna uma resposta HTTP 201 Created com o VendaResponse criado no corpo da resposta
-        SaleResponse saleResponse = saleService.makeSale(saleRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saleResponse);
+        SaleResponseTest saleResponseTest = saleServiceTest.makeSale(saleRequestTest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saleResponseTest);
     }
 }

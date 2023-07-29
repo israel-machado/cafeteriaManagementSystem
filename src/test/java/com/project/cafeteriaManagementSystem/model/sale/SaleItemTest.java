@@ -1,4 +1,4 @@
-package com.project.cafeteriaManagementSystem.model.extract;
+package com.project.cafeteriaManagementSystem.model.sale;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,9 +11,8 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class ExtractResponse {
+public class SaleItemTest {
 
-    private BigDecimal totalCost;
-    private BigDecimal grossProfit;
-    private BigDecimal netProfit;
+    private String name;
+    private BigDecimal salePrice;
 }

@@ -3,6 +3,7 @@ package com.project.cafeteriaManagementSystem.mapping;
 import com.project.cafeteriaManagementSystem.model.material.MaterialDomain;
 import com.project.cafeteriaManagementSystem.model.material.MaterialRequest;
 import com.project.cafeteriaManagementSystem.model.material.MaterialResponse;
+import com.project.cafeteriaManagementSystem.service.MaterialService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 public class MaterialConverter {
 
     private final BatchConverter batchConverter;
+    private final MaterialService materialService;
 
     // Método para converter uma requisição de material (MaterialRequest) em um objeto MaterialDomain
     public MaterialDomain convertMaterialRequestToDomain(MaterialRequest materialRequest) {
@@ -25,10 +27,11 @@ public class MaterialConverter {
 
     // Método para converter um objeto MaterialDomain em uma resposta de material (MaterialResponse)
     public MaterialResponse convertMaterialDomainToResponse(MaterialDomain materialDomain) {
+        double stock = materialService.calculateStock(materialDomain);
         return MaterialResponse.builder()
                 .id(materialDomain.getId())
                 .name(materialDomain.getName())
-                .stock(materialDomain.getStock())
+                .stock(stock)
                 .unitMeasure(materialDomain.getUnitMeasure())
                 .minimumStockQuantity(materialDomain.getMinimumStockQuantity())
                 .batchResponsesList(batchConverter.convertBatchDomainListToResponseList(materialDomain.getBatchDomainList()))

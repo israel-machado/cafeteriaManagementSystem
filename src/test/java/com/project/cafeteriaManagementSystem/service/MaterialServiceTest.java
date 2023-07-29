@@ -2,15 +2,15 @@ package com.project.cafeteriaManagementSystem.service;
 
 import com.project.cafeteriaManagementSystem.exception.InvalidDataException;
 import com.project.cafeteriaManagementSystem.exception.InvalidMaterialDataException;
-import com.project.cafeteriaManagementSystem.mapping.BatchConverter;
-import com.project.cafeteriaManagementSystem.mapping.MaterialConverter;
-import com.project.cafeteriaManagementSystem.model.batch.BatchDomain;
-import com.project.cafeteriaManagementSystem.model.batch.BatchResponse;
-import com.project.cafeteriaManagementSystem.model.material.MaterialDomain;
-import com.project.cafeteriaManagementSystem.model.material.MaterialMinimumStockRequest;
-import com.project.cafeteriaManagementSystem.model.material.MaterialRequest;
-import com.project.cafeteriaManagementSystem.model.material.MaterialResponse;
-import com.project.cafeteriaManagementSystem.repository.MaterialRepository;
+import com.project.cafeteriaManagementSystem.mapping.BatchConverterTest;
+import com.project.cafeteriaManagementSystem.mapping.MaterialConverterTest;
+import com.project.cafeteriaManagementSystem.model.batch.BatchDomainTest;
+import com.project.cafeteriaManagementSystem.model.batch.BatchResponseTest;
+import com.project.cafeteriaManagementSystem.model.material.MaterialDomainTest;
+import com.project.cafeteriaManagementSystem.model.material.MaterialMinimumStockRequestTest;
+import com.project.cafeteriaManagementSystem.model.material.MaterialRequestTest;
+import com.project.cafeteriaManagementSystem.model.material.MaterialResponseTest;
+import com.project.cafeteriaManagementSystem.repository.MaterialRepositoryTest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -22,40 +22,40 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class MaterialService {
+public class MaterialServiceTest {
     // Atributos e injeções de dependência
-    private final MaterialConverter materialConverter;
-    private final MaterialRepository materialRepository;
-    private final BatchConverter batchConverter;
+    private final MaterialConverterTest materialConverterTest;
+    private final MaterialRepositoryTest materialRepositoryTest;
+    private final BatchConverterTest batchConverterTest;
 
     // GET ALL
-    public List<MaterialResponse> getAllMaterials() {
+    public List<MaterialResponseTest> getAllMaterials() {
         // Obtém todos os materiais do repositório e converte para uma lista de MaterialResponse
-        List<MaterialDomain> materialList = materialRepository.findAll();
-        return materialConverter.convertMaterialDomainListToResponseList(materialList);
+        List<MaterialDomainTest> materialList = materialRepositoryTest.findAll();
+        return materialConverterTest.convertMaterialDomainListToResponseList(materialList);
     }
 
     // GET BY ID
-    public MaterialResponse getMaterialById(String id) {
+    public MaterialResponseTest getMaterialById(String id) {
         // Obtém o material pelo ID do repositório e converte para MaterialResponse
-        MaterialDomain materialDomain = materialRepository.findById(id)
+        MaterialDomainTest materialDomainTest = materialRepositoryTest.findById(id)
                 .orElseThrow(() -> new InvalidDataException("Material não encontrado pelo ID: " + id));
-        return materialConverter.convertMaterialDomainToResponse(materialDomain);
+        return materialConverterTest.convertMaterialDomainToResponse(materialDomainTest);
     }
 
     // UPDATE
-    public MaterialResponse updateMaterial(String id, MaterialRequest materialRequest) {
+    public MaterialResponseTest updateMaterial(String id, MaterialRequestTest materialRequestTest) {
         try {
             // Verifica se a requisição do material é nula
-            if (materialRequest == null) {
+            if (materialRequestTest == null) {
                 throw new InvalidDataException("Requisição do material não pode ser nula.");
             }
             // Converte a requisição para o domínio e define o ID para atualizar o material existente
-            MaterialDomain materialDomain = materialConverter.convertMaterialRequestToDomain(materialRequest);
-            materialDomain.setId(id);
+            MaterialDomainTest materialDomainTest = materialConverterTest.convertMaterialRequestToDomain(materialRequestTest);
+            materialDomainTest.setId(id);
             // Salva o material atualizado no repositório
-            MaterialDomain updatedMaterial = materialRepository.save(materialDomain);
-            return materialConverter.convertMaterialDomainToResponse(updatedMaterial);
+            MaterialDomainTest updatedMaterial = materialRepositoryTest.save(materialDomainTest);
+            return materialConverterTest.convertMaterialDomainToResponse(updatedMaterial);
         } catch (InvalidDataException e) {
             throw new InvalidMaterialDataException("Falha ao atualizar o material com o ID: " + id);
         }
@@ -65,7 +65,7 @@ public class MaterialService {
     public void deleteMaterial(String id) {
         try {
             // Deleta o material pelo ID do repositório
-            materialRepository.deleteById(id);
+            materialRepositoryTest.deleteById(id);
         } catch (EmptyResultDataAccessException e) {
             throw new InvalidMaterialDataException("Material não encontrado através do ID: " + id);
         } catch (DataIntegrityViolationException e) {
@@ -74,10 +74,10 @@ public class MaterialService {
     }
 
     // INSERT
-    public MaterialDomain createMaterial(MaterialRequest materialRequest) {
+    public MaterialDomainTest createMaterial(MaterialRequestTest materialRequestTest) {
 
         // Verifica se o material já existe no banco de dados pelo nome
-        MaterialDomain existingMaterial = materialRepository.findByName(materialRequest.getName());
+        MaterialDomainTest existingMaterial = materialRepositoryTest.findByName(materialRequestTest.getName());
 
         if (existingMaterial != null) {
             // Se o material já existe, retorna uma mensagem de erro
@@ -86,35 +86,35 @@ public class MaterialService {
         }
 
         // Se o material não existe, cria um novo material
-        MaterialDomain materialDomain = materialConverter.convertMaterialRequestToDomain(materialRequest);
+        MaterialDomainTest materialDomainTest = materialConverterTest.convertMaterialRequestToDomain(materialRequestTest);
 
         // Salva o material no banco de dados e retorna
-        return materialRepository.save(materialDomain);
+        return materialRepositoryTest.save(materialDomainTest);
     }
 
     // Método para obter os materiais que estão prestes a vencer
-    public List<MaterialResponse> getExpiringMaterials(int daysToExpiration) {
+    public List<MaterialResponseTest> getExpiringMaterials(int daysToExpiration) {
         LocalDate currentDate = LocalDate.now();
         LocalDate expirationDateThreshold = currentDate.plusDays(daysToExpiration);
 
         // Obtém todos os materiais do repositório
-        List<MaterialDomain> materials = materialRepository.findAll();
-        List<MaterialResponse> expiringMaterials = new ArrayList<>();
+        List<MaterialDomainTest> materials = materialRepositoryTest.findAll();
+        List<MaterialResponseTest> expiringMaterials = new ArrayList<>();
 
-        for (MaterialDomain material : materials) {
+        for (MaterialDomainTest material : materials) {
             // Obtém a lista de lotes do material atual
-            List<BatchDomain> batchDomainList = material.getBatchDomainList();
+            List<BatchDomainTest> batchDomainTestList = material.getBatchDomainTestList();
 
-            if (batchDomainList.isEmpty()) {
+            if (batchDomainTestList.isEmpty()) {
                 throw new InvalidDataException("O Material não possui lotes no momento.");
             }
             //Inicializa uma lista de lote do tipo Response
-            List<BatchResponse> expiringBatches = new ArrayList<>();
+            List<BatchResponseTest> expiringBatches = new ArrayList<>();
 
-            for (BatchDomain batch : batchDomainList) {
+            for (BatchDomainTest batch : batchDomainTestList) {
                 if (batch.getValidity().isBefore(expirationDateThreshold.atStartOfDay())) {
                     // Se o batch está prestes a vencer, adiciona na lista de lotes expirando
-                    expiringBatches.add(batchConverter.convertBatchDomainToResponse(batch));
+                    expiringBatches.add(batchConverterTest.convertBatchDomainToResponse(batch));
                 }
             }
             // Se a lista expiringBatches estiver vazia retorna uma mensagem
@@ -123,34 +123,34 @@ public class MaterialService {
             }
 
             // Se há lotes expirando, cria uma resposta para o material e adiciona na lista
-            MaterialResponse materialResponse = materialConverter.convertMaterialDomainToResponse(material);
-            materialResponse.setBatchResponsesList(expiringBatches);
-            expiringMaterials.add(materialResponse);
+            MaterialResponseTest materialResponseTest = materialConverterTest.convertMaterialDomainToResponse(material);
+            materialResponseTest.setBatchResponsesListTest(expiringBatches);
+            expiringMaterials.add(materialResponseTest);
         }
 
         return expiringMaterials;
     }
 
     // Método para atualizar a quantidade mínima de estoque de um material
-    public MaterialResponse updateMaterialMinimumStock(MaterialMinimumStockRequest request) {
+    public MaterialResponseTest updateMaterialMinimumStock(MaterialMinimumStockRequestTest request) {
         // Obtém o material pelo ID do repositório
-        MaterialDomain material = materialRepository.findById(request.getMaterialId())
+        MaterialDomainTest material = materialRepositoryTest.findById(request.getMaterialId())
                 .orElseThrow(() -> new InvalidDataException("Material não encontrado pelo ID: " + request.getMaterialId()));
 
         // Atualiza a quantidade mínima de estoque do material e salva no repositório
         material.setMinimumStockQuantity(request.getMinimumStockQuantity());
-        materialRepository.save(material);
+        materialRepositoryTest.save(material);
 
         // Converte o domínio atualizado para a resposta e retorna
-        return materialConverter.convertMaterialDomainToResponse(material);
+        return materialConverterTest.convertMaterialDomainToResponse(material);
     }
 
     // Método para atualizar o estoque de todos materiais
-    public double calculateStock(MaterialDomain materialDomain) {
-        List<BatchDomain> batchDomainList = materialDomain.getBatchDomainList();
+    public double calculateStock(MaterialDomainTest materialDomainTest) {
+        List<BatchDomainTest> batchDomainTestList = materialDomainTest.getBatchDomainTestList();
         double totalStock = 0.0;
 
-        for (BatchDomain batch : batchDomainList) {
+        for (BatchDomainTest batch : batchDomainTestList) {
             totalStock += batch.getRemainingAmount();
         }
 
@@ -158,21 +158,21 @@ public class MaterialService {
     }
 
     // Método para obter os materiais com estoque baixo
-    public List<MaterialResponse> getMaterialsWithLowStock() {
+    public List<MaterialResponseTest> getMaterialsWithLowStock() {
         // Obtém todos os materiais do repositório
-        List<MaterialDomain> materialDomainList = materialRepository.findAll();
-        List<MaterialResponse> materialsWithLowStock = new ArrayList<>();
+        List<MaterialDomainTest> materialDomainTestList = materialRepositoryTest.findAll();
+        List<MaterialResponseTest> materialsWithLowStock = new ArrayList<>();
 
-        for (MaterialDomain material : materialDomainList) {
+        for (MaterialDomainTest material : materialDomainTestList) {
             // Obtém a lista de lotes do material atual
-            List<BatchDomain> batchDomainList = material.getBatchDomainList();
-            if (batchDomainList.isEmpty()) {
+            List<BatchDomainTest> batchDomainTestList = material.getBatchDomainTestList();
+            if (batchDomainTestList.isEmpty()) {
                 throw new InvalidDataException("O Material não possui lotes no momento.");
             }
             // Inicializa a variável do resultado da soma da quantidade restante total dos lotes
             int totalAmount = 0;
 
-            for (BatchDomain batch : batchDomainList) {
+            for (BatchDomainTest batch : batchDomainTestList) {
                 // Pra cada lote da lista vai somar a quantidade restante no totalAmount
                 totalAmount += batch.getRemainingAmount();
             }
@@ -182,8 +182,8 @@ public class MaterialService {
                 throw new InvalidMaterialDataException("O material " + material.getName() + " está com estoque abaixo no mínimo.");
             }
 
-            MaterialResponse materialResponse = materialConverter.convertMaterialDomainToResponse(material);
-            materialsWithLowStock.add(materialResponse);
+            MaterialResponseTest materialResponseTest = materialConverterTest.convertMaterialDomainToResponse(material);
+            materialsWithLowStock.add(materialResponseTest);
         }
 
         return materialsWithLowStock;

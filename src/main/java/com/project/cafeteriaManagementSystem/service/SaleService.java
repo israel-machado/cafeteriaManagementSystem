@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -34,6 +35,7 @@ public class SaleService {
     private final MenuItemRepository menuItemRepository;
     private final SaleConverter saleConverter;
     private final BatchService batchService;
+    private final MaterialService materialService;
 
     // Método para obter uma lista de todas as vendas
     public List<SaleResponse> getAllSales() {
@@ -69,20 +71,16 @@ public class SaleService {
                     throw new InvalidMaterialDataException("Material não encontrado no DB pelo nome: " + materialInfo.getMaterialName());
                 }
                 // Verifica se o estoque é suficiente para a quantidade informada para o prato
-                if (materialDomain.getStock() > materialInfo.getQuantity()) {
-                    // Obtém as quantidades atuais do material no estoque e a quantidade a ser consumida
-                    double materialStock = materialDomain.getStock();
-                    double ammountConsumed = materialInfo.getQuantity();
+                if (materialService.calculateStock(materialDomain) > materialInfo.getQuantity()) {
+                    // Consome do lote por ordem de validade cada material com a respectiva quantidade
+                    batchService.consumeAmountFromBatch(materialDomain, materialInfo.getQuantity());
 
-                    // Subtrai a quantidade consumida do estoque do material e salva as alterações no banco de dados
-                    materialDomain.setStock(materialStock - ammountConsumed);
-                    materialRepository.save(materialDomain);
                 } else { // Se não tiver estoque suficiente retorna uma mensagem de insufiência no estoque
                     throw new InsufficientMaterialStockException("Estoque insuficiente para o material: " + materialDomain.getName());
                 }
             }
 
-            totalSalePrice.add(menuItem.getSalePrice());
+           totalSalePrice = totalSalePrice.add(menuItem.getSalePrice());
         }
 
         // Custo total da venda
@@ -125,7 +123,7 @@ public class SaleService {
                 Collections.sort(batchDomainList);
 
                 // Calcula e consome do lote mais próximo a vencer
-                BigDecimal costForQuantity = batchService.calculateCostForQuantityAndConsumeFromBatch(materialDomain, amountToBeConsumed);
+                BigDecimal costForQuantity = batchService.calculateCostForQuantityFromBatch(materialDomain, amountToBeConsumed);
                 totalCost = totalCost.add(costForQuantity);
             }
         }
@@ -163,19 +161,28 @@ public class SaleService {
     }
 
     // Método para obter uma lista de vendas realizadas em um determinado período de dias
-    public List<SaleDomain> getSalesForTimePeriod(int duration) {
+    public List<SaleResponse> getSalesByDuration(int duration) {
         LocalDate currentDate = LocalDate.now();
         LocalDate startDate = currentDate.minusDays(duration);
-        return saleRepository.findByDateOfSaleBetween(startDate, currentDate);
+        List<SaleDomain> saleDomainList = saleRepository.findByDateOfSaleBetween(startDate, currentDate);
+        return saleConverter.convertSaleDomainListToSaleResponseList(saleDomainList);
+    }
+
+    // Método para obter uma lista de vendas realizadas em um determinado mês
+    public List<SaleResponse> getSalesForMonth(int month, int year) {
+        LocalDate startDate = LocalDate.of(year, month, 1);
+        LocalDate endDate = startDate.with(TemporalAdjusters.lastDayOfMonth());
+        List<SaleDomain> saleDomainList = saleRepository.findByDateOfSaleBetween(startDate, endDate);
+        return saleConverter.convertSaleDomainListToSaleResponseList(saleDomainList);
     }
 
     // Método para calcular o lucro total das vendas realizadas em um determinado período de dias
     public BigDecimal getProfitForTimePeriod(int duration) {
-        List<SaleDomain> salesForTimePeriod = getSalesForTimePeriod(duration);
+        List<SaleResponse> salesForTimePeriod = getSalesByDuration(duration);
         BigDecimal totalProfit = BigDecimal.ZERO;
 
         // Calcula o lucro total somando o lucro de cada venda no período especificado
-        for (SaleDomain sale : salesForTimePeriod) {
+        for (SaleResponse sale : salesForTimePeriod) {
             totalProfit = totalProfit.add(sale.getProfitValue());
         }
 

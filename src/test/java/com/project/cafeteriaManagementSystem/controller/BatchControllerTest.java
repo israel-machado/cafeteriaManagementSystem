@@ -1,8 +1,8 @@
 package com.project.cafeteriaManagementSystem.controller;
 
-import com.project.cafeteriaManagementSystem.model.batch.BatchRequest;
-import com.project.cafeteriaManagementSystem.model.batch.BatchResponse;
-import com.project.cafeteriaManagementSystem.service.BatchService;
+import com.project.cafeteriaManagementSystem.model.batch.BatchRequestTest;
+import com.project.cafeteriaManagementSystem.model.batch.BatchResponseTest;
+import com.project.cafeteriaManagementSystem.service.BatchServiceTest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,44 +14,44 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/batch")
-public class BatchController {
+public class BatchControllerTest {
 
-    private final BatchService batchService;
+    private final BatchServiceTest batchServiceTest;
 
     // Método para obter todos os lotes
     @GetMapping
-    public ResponseEntity<List<BatchResponse>> getAllBatches() {
+    public ResponseEntity<List<BatchResponseTest>> getAllBatches() {
         // Chama o serviço para obter todos os lotes e retorna uma resposta HTTP 200 OK com a lista de LoteResponse no corpo
-        return ResponseEntity.ok().body(batchService.getAllBatches());
+        return ResponseEntity.ok().body(batchServiceTest.getAllBatches());
     }
 
     // Método para obter um lote pelo ID
     @GetMapping("/{id}")
-    public ResponseEntity<BatchResponse> getBatchById(@PathVariable String id) {
+    public ResponseEntity<BatchResponseTest> getBatchById(@PathVariable String id) {
         // Chama o serviço para obter um lote pelo ID e retorna uma resposta HTTP 200 OK com o LoteResponse no corpo
-        return ResponseEntity.ok().body(batchService.getBatchById(id));
+        return ResponseEntity.ok().body(batchServiceTest.getBatchById(id));
     }
 
     // Método para criar um lote
     @PostMapping
-    public ResponseEntity<BatchResponse> createBatch(@Valid @RequestBody BatchRequest batchRequest) {
-        BatchResponse batchResponse = batchService.createBatch(batchRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(batchResponse);
+    public ResponseEntity<BatchResponseTest> createBatch(@Valid @RequestBody BatchRequestTest batchRequestTest) {
+        BatchResponseTest batchResponseTest = batchServiceTest.createBatch(batchRequestTest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(batchResponseTest);
     }
 
     // Método para atualizar a validade de um lote
     @PutMapping("/{id}")
-    public ResponseEntity<BatchResponse> updateBatch(@PathVariable String id,
-                                                     @Valid @RequestBody BatchRequest batchRequest) {
+    public ResponseEntity<BatchResponseTest> updateBatch(@PathVariable String id,
+                                                         @Valid @RequestBody BatchRequestTest batchRequestTest) {
         // Chama o serviço para atualizar a validade de um lote pelo ID e retorna uma resposta HTTP 200 OK com o LoteResponse atualizado no corpo
-        return ResponseEntity.ok().body(batchService.updateBatch(id, batchRequest));
+        return ResponseEntity.ok().body(batchServiceTest.updateBatch(id, batchRequestTest));
     }
 
     // Método para excluir um lote pelo ID
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBatch(@PathVariable String id) {
         // Chama o serviço para excluir um lote pelo ID e retorna uma resposta HTTP 204 No Content
-        batchService.deleteBatch(id);
+        batchServiceTest.deleteBatch(id);
         return ResponseEntity.noContent().build();
     }
 }

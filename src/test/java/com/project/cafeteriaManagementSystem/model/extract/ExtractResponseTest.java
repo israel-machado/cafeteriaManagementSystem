@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class ExtractResponse {
+public class ExtractResponseTest {
 
     private BigDecimal totalCost;
     private BigDecimal grossProfit;

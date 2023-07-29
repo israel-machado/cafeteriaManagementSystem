@@ -29,6 +29,7 @@ public class MenuItemService {
 
     private final MenuItemRepository menuItemRepository;
     private final MaterialRepository materialRepository;
+    private final MaterialService materialService;
     private final MenuItemConverter menuItemConverter;
     private final BatchService batchService;
 
@@ -70,11 +71,11 @@ public class MenuItemService {
         // Alterando o valor
         existingMenuItem.setSalePrice(menuItemRequest.getSalePrice());
 
-        // Alterando itens da receita
+        // Inicia uma lista nova de material info para alterar itens da receita
         List<MaterialInfo> materialInfoList = new ArrayList<>();
 
         for (MaterialInfo materialInfo : menuItemRequest.getMaterialsRecipe()) {
-            MaterialInfo newMaterialInfo = null;
+            MaterialInfo newMaterialInfo = new MaterialInfo();
             newMaterialInfo.setMaterialName(materialInfo.getMaterialName());
             newMaterialInfo.setQuantity(materialInfo.getQuantity());
             newMaterialInfo.setUnitMeasure(materialInfo.getUnitMeasure());
@@ -142,7 +143,7 @@ public class MenuItemService {
         }
 
         // Verifica se a quantidade em estoque do material é maior ou igual à quantidade requerida
-        return materialDomain.getStock() >= requiredQuantity;
+        return materialService.calculateStock(materialDomain) >= requiredQuantity;
     }
 
     // Método para obter uma lista detalhada de itens do cardápio com informações adicionais, como custo estimado
@@ -183,25 +184,12 @@ public class MenuItemService {
             // Ordena a lista de lotes por validade
             Collections.sort(batchDomainList);
 
-            // Calcula e consome do lote mais próximo a vencer
+            // Calcula dos lotes mais próximos a vencer
             BigDecimal costForQuantity = batchService.calculateCostForQuantityFromBatch(materialDomain, amountToBeConsumed);
             totalCost = totalCost.add(costForQuantity);
         }
 
         // Arredonda o custo total para duas casas decimais e retorna
         return totalCost.setScale(2, RoundingMode.HALF_UP);
-    }
-
-    // Método auxiliar para calcular o custo total de uma lista de lotes
-    private BigDecimal getTotalCostFromBatches(List<BatchDomain> batchDomainList) {
-        BigDecimal totalCost = BigDecimal.ZERO;
-
-        for (BatchDomain lote : batchDomainList) {
-            // Soma os custos totais de todos os lotes
-            totalCost = totalCost.add(lote.getTotalCost());
-        }
-
-        // Retorna o custo total somado de todos os lotes
-        return totalCost;
     }
 }

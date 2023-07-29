@@ -1,6 +1,6 @@
 package com.project.cafeteriaManagementSystem.model.material;
 
-import com.project.cafeteriaManagementSystem.model.batch.BatchDomain;
+import com.project.cafeteriaManagementSystem.model.batch.BatchDomainTest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,12 +15,12 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 @Document(collection = "materials")
-public class MaterialDomain {
+public class MaterialDomainTest {
 
     @Id
     private String id;
     private String name;
     private String unitMeasure; //TODO deixar stock apenas no Response / Refazer métodos que envolvem stock no BatchService
     private Double minimumStockQuantity;
-    private List<BatchDomain> batchDomainList;
+    private List<BatchDomainTest> batchDomainTestList;
 }

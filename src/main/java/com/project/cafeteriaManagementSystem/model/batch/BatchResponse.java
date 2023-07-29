@@ -17,7 +17,6 @@ public class BatchResponse {
 
     private String id;
     private Double initialAmount;
-    private BigDecimal cost;
     private BigDecimal totalCost;
     private LocalDateTime validity;
     private LocalDateTime dateOfPurchase;

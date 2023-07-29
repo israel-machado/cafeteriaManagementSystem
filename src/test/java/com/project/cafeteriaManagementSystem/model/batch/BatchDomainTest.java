@@ -1,6 +1,6 @@
 package com.project.cafeteriaManagementSystem.model.batch;
 
-import com.project.cafeteriaManagementSystem.model.material.MaterialDomain;
+import com.project.cafeteriaManagementSystem.model.material.MaterialDomainTest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Data
 @Document(collection = "batches")
-public class BatchDomain implements Comparable<BatchDomain> {
+public class BatchDomainTest implements Comparable<BatchDomainTest> {
 
     @Id
     private String id;
@@ -27,11 +27,11 @@ public class BatchDomain implements Comparable<BatchDomain> {
     private String supplierName;
     private Double remainingAmount;
     private Double wasteAmount;
-    private MaterialDomain materialDomain;
+    private MaterialDomainTest materialDomainTest;
 
     // Implementação do método compareTo() para comparar por validade
     @Override
-    public int compareTo(BatchDomain otherBatch) {
+    public int compareTo(BatchDomainTest otherBatch) {
         return this.validity.compareTo(otherBatch.validity);
     }
 }
