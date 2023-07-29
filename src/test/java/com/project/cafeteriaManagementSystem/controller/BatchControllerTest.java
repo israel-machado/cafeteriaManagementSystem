@@ -1,57 +1,65 @@
 package com.project.cafeteriaManagementSystem.controller;
 
-import com.project.cafeteriaManagementSystem.model.batch.BatchRequestTest;
+import com.project.cafeteriaManagementSystem.model.batch.BatchResponse;
 import com.project.cafeteriaManagementSystem.model.batch.BatchResponseTest;
-import com.project.cafeteriaManagementSystem.service.BatchServiceTest;
-import lombok.RequiredArgsConstructor;
+import com.project.cafeteriaManagementSystem.service.BatchService;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
-@RestController
-@RequiredArgsConstructor
-@RequestMapping("/batch")
-public class BatchControllerTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.when;
 
-    private final BatchServiceTest batchServiceTest;
+@ExtendWith(MockitoExtension.class)
+class BatchControllerTest {
 
-    // Método para obter todos os lotes
-    @GetMapping
-    public ResponseEntity<List<BatchResponseTest>> getAllBatches() {
-        // Chama o serviço para obter todos os lotes e retorna uma resposta HTTP 200 OK com a lista de LoteResponse no corpo
-        return ResponseEntity.ok().body(batchServiceTest.getAllBatches());
+    @Mock
+    private BatchService batchService;
+
+    @InjectMocks
+    private BatchController batchController;
+
+    @Test
+    void testGetAllBatches() {
+        // Mock of a list of BatchResponse
+        List<BatchResponse> batchResponses = Arrays.asList(
+                new BatchResponse("1", 100.0, BigDecimal.valueOf(50.0), LocalDateTime.now(), LocalDateTime.now().minusDays(1), "Fornecedor 1", 100.0, 0.0, null),
+                new BatchResponse("2", 200.0, BigDecimal.valueOf(100.0), LocalDateTime.now(), LocalDateTime.now().minusDays(2), "Fornecedor 2", 200.0, 0.0, null)
+        );
+
+        when(batchService.getAllBatches()).thenReturn(batchResponses);
+
+        // Use doAnswer to handle the conversion from List<BatchResponse> to List<BatchResponseTest>
+        doAnswer(invocation -> {
+            List<BatchResponse> response = invocation.getArgument(0);
+            List<BatchResponseTest> testResponse = response.stream()
+                    .map(this::convertToTestResponse)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(testResponse);
+        }).when(batchController).getAllBatches();
+
+        ResponseEntity<List<BatchResponse>> responseEntity = batchController.getAllBatches();
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        // You can verify the contents of the response as needed
     }
 
-    // Método para obter um lote pelo ID
-    @GetMapping("/{id}")
-    public ResponseEntity<BatchResponseTest> getBatchById(@PathVariable String id) {
-        // Chama o serviço para obter um lote pelo ID e retorna uma resposta HTTP 200 OK com o LoteResponse no corpo
-        return ResponseEntity.ok().body(batchServiceTest.getBatchById(id));
-    }
-
-    // Método para criar um lote
-    @PostMapping
-    public ResponseEntity<BatchResponseTest> createBatch(@Valid @RequestBody BatchRequestTest batchRequestTest) {
-        BatchResponseTest batchResponseTest = batchServiceTest.createBatch(batchRequestTest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(batchResponseTest);
-    }
-
-    // Método para atualizar a validade de um lote
-    @PutMapping("/{id}")
-    public ResponseEntity<BatchResponseTest> updateBatch(@PathVariable String id,
-                                                         @Valid @RequestBody BatchRequestTest batchRequestTest) {
-        // Chama o serviço para atualizar a validade de um lote pelo ID e retorna uma resposta HTTP 200 OK com o LoteResponse atualizado no corpo
-        return ResponseEntity.ok().body(batchServiceTest.updateBatch(id, batchRequestTest));
-    }
-
-    // Método para excluir um lote pelo ID
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBatch(@PathVariable String id) {
-        // Chama o serviço para excluir um lote pelo ID e retorna uma resposta HTTP 204 No Content
-        batchServiceTest.deleteBatch(id);
-        return ResponseEntity.noContent().build();
+    private BatchResponseTest convertToTestResponse(BatchResponse response) {
+        // Convert BatchResponse to BatchResponseTest manually here
+        // For example:
+        return new BatchResponseTest(response.getId(), response.getInitialAmount(), response.getTotalCost(),
+                response.getValidity(), response.getDateOfPurchase(), response.getSupplierName(),
+                response.getRemainingAmount(), response.getWasteAmount(), response.getMaterialDomain());
     }
 }

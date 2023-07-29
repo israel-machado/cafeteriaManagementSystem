@@ -6,6 +6,7 @@ import com.project.cafeteriaManagementSystem.model.batch.BatchDomain;
 import com.project.cafeteriaManagementSystem.model.batch.BatchRequest;
 import com.project.cafeteriaManagementSystem.model.batch.BatchResponse;
 import com.project.cafeteriaManagementSystem.model.material.MaterialDomain;
+import com.project.cafeteriaManagementSystem.model.material.MaterialRequest;
 import com.project.cafeteriaManagementSystem.repository.BatchRepository;
 import com.project.cafeteriaManagementSystem.repository.MaterialRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,11 +31,21 @@ public class BatchService {
 
     // Método para criar um novo lote associado a um material específico
     public BatchResponse createBatch(BatchRequest batchRequest) {
+        // Verificar se o batchRequest é nulo ou se o materialRequest é nulo
+        if (batchRequest == null || batchRequest.getMaterialRequest() == null) {
+            throw new IllegalArgumentException("A Requisição do Lote e do Material não podem ser nulas.");
+        }
+
         // Procura um materialDomain através do nome da requisição
         MaterialDomain materialDomain = materialRepository.findByName(batchRequest.getMaterialRequest().getName());
+
         // Se o nome não retornar um objeto, é criado o material e salvo no DB
         if (materialDomain == null) {
-            materialDomain = materialService.createMaterial(batchRequest.getMaterialRequest());
+            MaterialRequest materialRequest = batchRequest.getMaterialRequest();
+            if (materialRequest.getName() == null || materialRequest.getName().isEmpty()) {
+                throw new IllegalArgumentException("O nome da requisição do material não pode ser nulo.");
+            }
+            materialDomain = materialService.createMaterial(materialRequest);
             materialRepository.save(materialDomain);
         }
 
@@ -54,7 +65,7 @@ public class BatchService {
                 .build();
 
         // Salva o novo lote no banco de dados usando o repositório e o retorna
-        batchRepository.save(batchDomain);
+        batchDomain = batchRepository.save(batchDomain);
 
         // Converte para Response e retorna
         return batchConverter.convertBatchDomainToResponse(batchDomain);

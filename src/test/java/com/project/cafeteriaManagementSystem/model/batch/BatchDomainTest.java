@@ -1,37 +1,28 @@
 package com.project.cafeteriaManagementSystem.model.batch;
 
-import com.project.cafeteriaManagementSystem.model.material.MaterialDomainTest;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import org.junit.jupiter.api.Test;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
-@Document(collection = "batches")
-public class BatchDomainTest implements Comparable<BatchDomainTest> {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-    @Id
-    private String id;
-    private Double initialAmount;
-    private BigDecimal totalCost;
-    private LocalDateTime validity;
-    private LocalDateTime dateOfPurchase;
-    private String supplierName;
-    private Double remainingAmount;
-    private Double wasteAmount;
-    private MaterialDomainTest materialDomainTest;
+public class BatchDomainTest {
 
-    // Implementação do método compareTo() para comparar por validade
-    @Override
-    public int compareTo(BatchDomainTest otherBatch) {
-        return this.validity.compareTo(otherBatch.validity);
+    @Test
+    void testBatchDomainCompareTo() {
+        // Crie dois objetos BatchDomain com validades diferentes
+        BatchDomain batch1 = new BatchDomain();
+        batch1.setId("1");
+        batch1.setValidity(LocalDateTime.of(2023, 7, 1, 12, 0)); // 1º de julho de 2023, 12:00
+
+        BatchDomain batch2 = new BatchDomain();
+        batch2.setId("2");
+        batch2.setValidity(LocalDateTime.of(2023, 7, 2, 12, 0)); // 2 de julho de 2023, 12:00
+
+        // Verifique se o método compareTo() funciona corretamente
+        assertTrue(batch1.compareTo(batch2) < 0); // batch1 é anterior a batch2
+        assertTrue(batch2.compareTo(batch1) > 0); // batch2 é posterior a batch1
+        assertEquals(0, batch1.compareTo(batch1)); // batch1 é igual a ele mesmo
     }
 }
