@@ -15,6 +15,7 @@ import com.project.cafeteriaManagementSystem.model.sale.SaleResponse;
 import com.project.cafeteriaManagementSystem.repository.MaterialRepository;
 import com.project.cafeteriaManagementSystem.repository.MenuItemRepository;
 import com.project.cafeteriaManagementSystem.repository.SaleRepository;
+import com.project.cafeteriaManagementSystem.util.Calculation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +36,7 @@ public class SaleService {
     private final MenuItemRepository menuItemRepository;
     private final SaleConverter saleConverter;
     private final BatchService batchService;
-    private final MaterialService materialService;
+    private final Calculation calculation;
 
     // Método para obter uma lista de todas as vendas
     public List<SaleResponse> getAllSales() {
@@ -71,7 +72,7 @@ public class SaleService {
                     throw new InvalidMaterialDataException("Material não encontrado no DB pelo nome: " + materialInfo.getMaterialName());
                 }
                 // Verifica se o estoque é suficiente para a quantidade informada para o prato
-                if (materialService.calculateStock(materialDomain) > materialInfo.getQuantity()) {
+                if (calculation.calculateStock(materialDomain) > materialInfo.getQuantity()) {
                     // Consome do lote por ordem de validade cada material com a respectiva quantidade
                     batchService.consumeAmountFromBatch(materialDomain, materialInfo.getQuantity());
 

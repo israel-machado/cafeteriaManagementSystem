@@ -13,6 +13,7 @@ import com.project.cafeteriaManagementSystem.model.menuItem.MenuItemRequest;
 import com.project.cafeteriaManagementSystem.model.menuItem.MenuItemResponse;
 import com.project.cafeteriaManagementSystem.repository.MaterialRepository;
 import com.project.cafeteriaManagementSystem.repository.MenuItemRepository;
+import com.project.cafeteriaManagementSystem.util.Calculation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,7 @@ public class MenuItemService {
 
     private final MenuItemRepository menuItemRepository;
     private final MaterialRepository materialRepository;
-    private final MaterialService materialService;
+    private final Calculation calculation;
     private final MenuItemConverter menuItemConverter;
     private final BatchService batchService;
 
@@ -143,7 +144,7 @@ public class MenuItemService {
         }
 
         // Verifica se a quantidade em estoque do material é maior ou igual à quantidade requerida
-        return materialService.calculateStock(materialDomain) >= requiredQuantity;
+        return calculation.calculateStock(materialDomain) >= requiredQuantity;
     }
 
     // Método para obter uma lista detalhada de itens do cardápio com informações adicionais, como custo estimado
