@@ -1,7 +1,7 @@
 package com.project.cafeteriaManagementSystem.controller;
 
+import com.project.cafeteriaManagementSystem.model.batch.BatchRequest;
 import com.project.cafeteriaManagementSystem.model.batch.BatchResponse;
-import com.project.cafeteriaManagementSystem.model.batch.BatchResponseTest;
 import com.project.cafeteriaManagementSystem.service.BatchService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,18 +11,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class BatchControllerTest {
+public class BatchControllerTest {
 
     @Mock
     private BatchService batchService;
@@ -32,34 +29,89 @@ class BatchControllerTest {
 
     @Test
     void testGetAllBatches() {
-        // Mock of a list of BatchResponse
-        List<BatchResponse> batchResponses = Arrays.asList(
-                new BatchResponse("1", 100.0, BigDecimal.valueOf(50.0), LocalDateTime.now(), LocalDateTime.now().minusDays(1), "Fornecedor 1", 100.0, 0.0, null),
-                new BatchResponse("2", 200.0, BigDecimal.valueOf(100.0), LocalDateTime.now(), LocalDateTime.now().minusDays(2), "Fornecedor 2", 200.0, 0.0, null)
-        );
+        // Criar um mock de lista de BatchResponse para o serviço retornar
+        List<BatchResponse> mockBatchList = new ArrayList<>();
+        mockBatchList.add(new BatchResponse());
+        // Configurar o comportamento do serviço para retornar a lista mockBatchList
+        when(batchService.getAllBatches()).thenReturn(mockBatchList);
 
-        when(batchService.getAllBatches()).thenReturn(batchResponses);
-
-        // Use doAnswer to handle the conversion from List<BatchResponse> to List<BatchResponseTest>
-        doAnswer(invocation -> {
-            List<BatchResponse> response = invocation.getArgument(0);
-            List<BatchResponseTest> testResponse = response.stream()
-                    .map(this::convertToTestResponse)
-                    .collect(Collectors.toList());
-            return ResponseEntity.ok(testResponse);
-        }).when(batchController).getAllBatches();
-
+        // Chamar o método do controller
         ResponseEntity<List<BatchResponse>> responseEntity = batchController.getAllBatches();
 
+        // Verificar se o serviço foi chamado corretamente
+        verify(batchService, times(1)).getAllBatches();
+
+        // Verificar o resultado
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        // You can verify the contents of the response as needed
+        assertEquals(mockBatchList, responseEntity.getBody());
     }
 
-    private BatchResponseTest convertToTestResponse(BatchResponse response) {
-        // Convert BatchResponse to BatchResponseTest manually here
-        // For example:
-        return new BatchResponseTest(response.getId(), response.getInitialAmount(), response.getTotalCost(),
-                response.getValidity(), response.getDateOfPurchase(), response.getSupplierName(),
-                response.getRemainingAmount(), response.getWasteAmount(), response.getMaterialDomain());
+    @Test
+    void testGetBatchById() {
+        // Criar um mock de BatchResponse para o serviço retornar
+        BatchResponse mockBatchResponse = new BatchResponse();
+        // Configurar o comportamento do serviço para retornar o mockBatchResponse
+        when(batchService.getBatchById(anyString())).thenReturn(mockBatchResponse);
+
+        // Chamar o método do controller
+        ResponseEntity<BatchResponse> responseEntity = batchController.getBatchById("someId");
+
+        // Verificar se o serviço foi chamado corretamente com o ID correto
+        verify(batchService, times(1)).getBatchById(eq("someId"));
+
+        // Verificar o resultado
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(mockBatchResponse, responseEntity.getBody());
+    }
+
+    @Test
+    void testCreateBatch() {
+        // Criar um mock de BatchRequest e BatchResponse para o serviço retornar
+        BatchRequest mockBatchRequest = new BatchRequest();
+        BatchResponse mockBatchResponse = new BatchResponse();
+        // Configurar o comportamento do serviço para retornar o mockBatchResponse
+        when(batchService.createBatch(any())).thenReturn(mockBatchResponse);
+
+        // Chamar o método do controller
+        ResponseEntity<BatchResponse> responseEntity = batchController.createBatch(mockBatchRequest);
+
+        // Verificar se o serviço foi chamado corretamente com o BatchRequest correto
+        verify(batchService, times(1)).createBatch(eq(mockBatchRequest));
+
+        // Verificar o resultado
+        assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
+        assertEquals(mockBatchResponse, responseEntity.getBody());
+    }
+
+    @Test
+    void testUpdateBatch() {
+        // Criar um mock de BatchRequest e BatchResponse para o serviço retornar
+        BatchRequest mockBatchRequest = new BatchRequest();
+        BatchResponse mockBatchResponse = new BatchResponse();
+        // Configurar o comportamento do serviço para retornar o mockBatchResponse
+        when(batchService.updateBatch(anyString(), any())).thenReturn(mockBatchResponse);
+
+        // Chamar o método do controller
+        ResponseEntity<BatchResponse> responseEntity = batchController.updateBatch("someId", mockBatchRequest);
+
+        // Verificar se o serviço foi chamado corretamente com o ID correto e o BatchRequest correto
+        verify(batchService, times(1)).updateBatch(eq("someId"), eq(mockBatchRequest));
+
+        // Verificar o resultado
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(mockBatchResponse, responseEntity.getBody());
+    }
+
+    @Test
+    void testDeleteBatch() {
+        // Chamar o método do controller
+        ResponseEntity<Void> responseEntity = batchController.deleteBatch("someId");
+
+        // Verificar se o serviço foi chamado corretamente com o ID correto
+        verify(batchService, times(1)).deleteBatch(eq("someId"));
+
+        // Verificar o resultado
+        assertEquals(HttpStatus.NO_CONTENT, responseEntity.getStatusCode());
+        assertNull(responseEntity.getBody());
     }
 }

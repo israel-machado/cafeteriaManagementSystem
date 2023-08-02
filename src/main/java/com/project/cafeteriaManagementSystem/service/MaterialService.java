@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -50,9 +51,15 @@ public class MaterialService {
             if (materialRequest == null) {
                 throw new InvalidDataException("Requisição do material não pode ser nula.");
             }
+
+            // Verifica se o material com o ID fornecido já existe no banco de dados
+            MaterialDomain existingMaterialOptional = materialRepository.findById(id)
+                    .orElseThrow(() -> new InvalidMaterialDataException("Material com o ID: " + id + " não encontrado."));
+
             // Converte a requisição para o domínio e define o ID para atualizar o material existente
             MaterialDomain materialDomain = materialConverter.convertMaterialRequestToDomain(materialRequest);
             materialDomain.setId(id);
+
             // Salva o material atualizado no repositório
             MaterialDomain updatedMaterial = materialRepository.save(materialDomain);
             return materialConverter.convertMaterialDomainToResponse(updatedMaterial);
@@ -62,15 +69,12 @@ public class MaterialService {
     }
 
     // DELETE
-    public void deleteMaterial(String id) {
-        try {
-            // Deleta o material pelo ID do repositório
-            materialRepository.deleteById(id);
-        } catch (EmptyResultDataAccessException e) {
-            throw new InvalidMaterialDataException("Material não encontrado através do ID: " + id);
-        } catch (DataIntegrityViolationException e) {
-            throw new InvalidMaterialDataException("Erro ao deletar material com o ID: " + id + " - " + e.getMessage());
+    public void deleteMaterial(String materialId) {
+        if (!materialRepository.existsById(materialId)) {
+            throw new InvalidMaterialDataException("Material não encontrado.");
         }
+
+        materialRepository.deleteById(materialId);
     }
 
     // INSERT
